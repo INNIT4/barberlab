@@ -1,0 +1,52 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { and, eq, lt } from "drizzle-orm";
+import { randomBytes } from "node:crypto";
+import { db } from "@/lib/db";
+import { invitations } from "@/lib/db/schema";
+import { getCurrentOrg } from "@/lib/auth/current-user";
+
+export type InviteActionState = {
+  error?: string;
+  fieldErrors?: Record<string, string>;
+  ok?: boolean;
+};
+
+export async function createInvitationAction(
+  _prev: InviteActionState,
+  formData: FormData
+): Promise<InviteActionState> {
+  const { org } = await getCurrentOrg();
+  const email = (formData.get("email") as string)?.trim() ?? "";
+
+  if (!email.includes("@") || email.length < 5) {
+    return { error: "Ingresa un email válido", fieldErrors: { email: "Email inválido" } };
+  }
+
+  const expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + 7);
+
+  const token = randomBytes(32).toString("hex");
+
+  await db.insert(invitations).values({
+    organizationId: org.id,
+    email,
+    role: "staff",
+    token,
+    expiresAt,
+  });
+
+  revalidatePath("/barberos");
+  return { ok: true };
+}
+
+export async function deleteInvitationAction(id: string) {
+  const { org } = await getCurrentOrg();
+  await db
+    .delete(invitations)
+    .where(
+      and(eq(invitations.id, id), eq(invitations.organizationId, org.id))
+    );
+  revalidatePath("/barberos");
+}

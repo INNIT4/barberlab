@@ -1,0 +1,207 @@
+import type { Metadata } from "next";
+import { and, asc, eq, gte, lt } from "drizzle-orm";
+import { formatInTimeZone, fromZonedTime, toZonedTime } from "date-fns-tz";
+import { startOfWeek, addDays } from "date-fns";
+import { DashboardHeader } from "@/components/dashboard/dashboard-header";
+import { StatCard } from "@/components/dashboard/stat-card";
+import { db } from "@/lib/db";
+import { appointments, barbers, services, customers, barberServices } from "@/lib/db/schema";
+import { getCurrentOrg } from "@/lib/auth/current-user";
+import { NewAppointmentButton } from "./new-appointment-dialog";
+import { WeekView } from "./week-view";
+
+export const metadata: Metadata = {
+  title: "Agenda — BarberApp",
+};
+
+const fmt = new Intl.NumberFormat("es-MX", {
+  style: "currency",
+  currency: "MXN",
+  maximumFractionDigits: 0,
+});
+
+export default async function AgendaPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ week?: string }>;
+}) {
+  const { org } = await getCurrentOrg();
+  const tz = org.timezone;
+  const params = await searchParams;
+
+  const todayLocal = formatInTimeZone(new Date(), tz, "yyyy-MM-dd");
+
+  const weekStartLocal = params.week ?? formatInTimeZone(
+    startOfWeek(toZonedTime(new Date(), tz), { weekStartsOn: 1 }),
+    tz,
+    "yyyy-MM-dd"
+  );
+
+  const weekStart = fromZonedTime(`${weekStartLocal} 00:00:00`, tz);
+  const weekEnd = addDays(weekStart, 7);
+
+  const [team, catalog, directory, assignments] = await Promise.all([
+    db
+      .select({ id: barbers.id, name: barbers.name, avatarTone: barbers.avatarTone })
+      .from(barbers)
+      .where(and(eq(barbers.organizationId, org.id), eq(barbers.active, true)))
+      .orderBy(asc(barbers.name)),
+    db
+      .select({
+        id: services.id,
+        name: services.name,
+        durationMinutes: services.durationMinutes,
+        priceMxn: services.priceMxn,
+      })
+      .from(services)
+      .where(and(eq(services.organizationId, org.id), eq(services.active, true)))
+      .orderBy(asc(services.sortOrder), asc(services.name)),
+    db
+      .select({
+        id: customers.id,
+        name: customers.name,
+        phone: customers.phone,
+      })
+      .from(customers)
+      .where(eq(customers.organizationId, org.id))
+      .orderBy(asc(customers.name)),
+    db
+      .select({
+        barberId: barberServices.barberId,
+        serviceId: barberServices.serviceId,
+      })
+      .from(barberServices)
+      .innerJoin(barbers, eq(barberServices.barberId, barbers.id))
+      .where(eq(barbers.organizationId, org.id)),
+  ]);
+
+  const serviceIdsByBarber: Record<string, string[]> = {};
+  for (const a of assignments) {
+    const list = serviceIdsByBarber[a.barberId] ?? [];
+    list.push(a.serviceId);
+    serviceIdsByBarber[a.barberId] = list;
+  }
+
+  const weekAppointments = await db
+    .select({
+      id: appointments.id,
+      startsAt: appointments.startsAt,
+      endsAt: appointments.endsAt,
+      status: appointments.status,
+      priceMxn: appointments.priceMxn,
+      barberId: appointments.barberId,
+      barberName: barbers.name,
+      barberTone: barbers.avatarTone,
+      serviceName: services.name,
+      serviceDuration: services.durationMinutes,
+      customerName: customers.name,
+      customerPhone: customers.phone,
+    })
+    .from(appointments)
+    .leftJoin(barbers, eq(appointments.barberId, barbers.id))
+    .leftJoin(services, eq(appointments.serviceId, services.id))
+    .leftJoin(customers, eq(appointments.customerId, customers.id))
+    .where(
+      and(
+        eq(appointments.organizationId, org.id),
+        gte(appointments.startsAt, weekStart),
+        lt(appointments.startsAt, weekEnd)
+      )
+    )
+    .orderBy(asc(appointments.startsAt));
+
+  const confirmedRevenue = weekAppointments
+    .filter((a) => a.status === "completada" || a.status === "confirmada")
+    .reduce((sum, a) => sum + a.priceMxn, 0);
+
+  const activeCount = weekAppointments.filter((a) => a.status !== "cancelada").length;
+  const totalMinutes = weekAppointments
+    .filter((a) => a.status !== "cancelada")
+    .reduce((s, a) => s + (a.serviceDuration ?? 0), 0);
+
+  const appointmentSlots = weekAppointments.map((a) => ({
+    id: a.id,
+    startsAt: a.startsAt.toISOString(),
+    endsAt: a.endsAt.toISOString(),
+    status: a.status,
+    priceMxn: a.priceMxn,
+    barberName: a.barberName ?? "",
+    barberTone: a.barberTone ?? "oklch(0.55 0.14 80)",
+    serviceName: a.serviceName ?? "",
+    serviceDuration: a.serviceDuration ?? 0,
+    customerName: a.customerName ?? "(cliente eliminado)",
+    customerPhone: a.customerPhone ?? "",
+  }));
+
+  const weekLabel = formatInTimeZone(
+    weekStart,
+    tz,
+    "EEEE d 'de' MMMM"
+  );
+
+  return (
+    <>
+      <DashboardHeader
+        title="Agenda"
+        subtitle={`${capitalize(weekLabel)} · ${org.name}`}
+        action={
+          <NewAppointmentButton
+            barbers={team}
+            services={catalog}
+            customers={directory}
+            defaultDate={todayLocal}
+            serviceIdsByBarber={serviceIdsByBarber}
+          />
+        }
+      />
+
+      <div className="flex-1 overflow-y-auto">
+        <div className="mx-auto max-w-6xl px-6 py-6 lg:px-8">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <StatCard
+              label="Citas de la semana"
+              value={String(activeCount)}
+              hint={`${team.length} barberos activos`}
+            />
+            <StatCard
+              label="Ingresos de la semana"
+              value={fmt.format(confirmedRevenue)}
+              tone="positive"
+              hint="confirmadas + completadas"
+            />
+            <StatCard
+              label="Clientes"
+              value={String(
+                new Set(
+                  weekAppointments
+                    .filter((a) => a.status !== "cancelada")
+                    .map((a) => a.customerName ?? "")
+                ).size
+              )}
+              hint="distintos en la semana"
+            />
+            <StatCard
+              label="Horas reservadas"
+              value={`${Math.round(totalMinutes / 60)}h`}
+              hint="ocupación semanal"
+            />
+          </div>
+
+          <div className="mt-8">
+            <WeekView
+              appointments={appointmentSlots}
+              today={todayLocal}
+              currentWeekStart={weekStartLocal}
+              timezone={tz}
+              barbers={team}
+            />
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+function capitalize(s: string): string {
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
