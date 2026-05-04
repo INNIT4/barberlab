@@ -117,6 +117,14 @@
   --font-sans: var(--font-sans);
   --font-serif: var(--font-serif);
   --font-display: var(--font-display);
+  /* Editorial color tokens — exposed as Tailwind color utilities */
+  --color-ink: var(--ink);
+  --color-paper: var(--paper);
+  --color-paper-deep: var(--paper-deep);
+  --color-oxblood: var(--oxblood);
+  --color-oxblood-soft: var(--oxblood-soft);
+  --color-brass: var(--brass);
+  --color-brass-deep: var(--brass-deep);
 }
 
 @layer base {

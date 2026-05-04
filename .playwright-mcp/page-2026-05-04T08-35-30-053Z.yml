@@ -1,0 +1,472 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e4]:
+      - generic [ref=e5]: Edición fundadores · MMXXVI
+      - generic [ref=e6]: Hecho en Sonora, México
+      - generic [ref=e9]: Vol. 1 · No. 4
+    - generic [ref=e11]:
+      - link "BarberApp — inicio" [ref=e12] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e17]:
+          - generic [ref=e18]: Barber
+          - generic [ref=e19]: App
+      - navigation "Principal" [ref=e20]:
+        - link "Características" [ref=e21] [cursor=pointer]:
+          - /url: /#caracteristicas
+        - link "Precios" [ref=e22] [cursor=pointer]:
+          - /url: /precios
+        - link "Preguntas" [ref=e23] [cursor=pointer]:
+          - /url: /#preguntas
+      - generic [ref=e24]:
+        - link "Iniciar sesión" [ref=e25] [cursor=pointer]:
+          - /url: /login
+        - link "Probar 14 días" [ref=e26] [cursor=pointer]:
+          - /url: /signup
+  - main [ref=e27]:
+    - generic [ref=e28]:
+      - generic [ref=e29]:
+        - generic [ref=e31]: ❦ La Gaceta del Barbero ❦
+        - generic [ref=e32]:
+          - generic [ref=e33]:
+            - generic [ref=e34]: Estreno · Beta para barberos fundadores
+            - heading "Tu barbería, sin citas perdidas ." [level=1] [ref=e36]:
+              - text: Tu barbería,
+              - text: sin citas
+              - generic [ref=e37]:
+                - text: perdidas
+                - img [ref=e38]
+              - text: .
+            - paragraph [ref=e40]: La agenda que tus clientes abren desde WhatsApp y que cobra puntual, aunque tú estés con la máquina en la mano. Hecha en México, en pesos, sin comisiones por cita.
+            - generic [ref=e41]:
+              - link "Probar 14 días gratis" [ref=e42] [cursor=pointer]:
+                - /url: /signup
+                - text: Probar 14 días gratis
+                - img
+              - link "Leer precios" [ref=e43] [cursor=pointer]:
+                - /url: /precios
+            - list [ref=e44]:
+              - listitem [ref=e45]:
+                - generic [ref=e46]: I.
+                - generic [ref=e47]: 14 días gratis · sin tarjeta
+              - listitem [ref=e48]:
+                - generic [ref=e49]: II.
+                - generic [ref=e50]: Cero comisión por cita
+              - listitem [ref=e51]:
+                - generic [ref=e52]: III.
+                - generic [ref=e53]: Listo en una tarde
+          - generic [ref=e54]:
+            - generic [ref=e56]:
+              - generic [ref=e58]:
+                - generic [ref=e59]:
+                  - generic [ref=e60]:
+                    - paragraph [ref=e61]: Agenda del día
+                    - paragraph [ref=e62]: Tony Barber Shop · Hermosillo
+                  - generic [ref=e63]:
+                    - img [ref=e64]
+                    - text: Vie · 03 May
+                - generic [ref=e69]:
+                  - generic [ref=e70]:
+                    - paragraph [ref=e71]: Citas hoy
+                    - paragraph [ref=e72]: "14"
+                  - generic [ref=e73]:
+                    - paragraph [ref=e74]: Ingresos
+                    - paragraph [ref=e75]: $3,240
+                  - generic [ref=e76]:
+                    - paragraph [ref=e77]: No-shows
+                    - paragraph [ref=e78]: "0"
+                - list [ref=e79]:
+                  - listitem [ref=e80]:
+                    - generic [ref=e81]: 09:30
+                    - generic [ref=e82]:
+                      - paragraph [ref=e83]: Luis Herrera
+                      - paragraph [ref=e84]:
+                        - img [ref=e85]
+                        - text: Corte clásico + barba
+                    - generic [ref=e91]:
+                      - paragraph [ref=e92]:
+                        - img [ref=e93]
+                        - text: Tony
+                      - paragraph [ref=e96]: 45 min
+                  - listitem [ref=e97]:
+                    - generic [ref=e98]: 10:15
+                    - generic [ref=e99]:
+                      - paragraph [ref=e100]: Daniel Ruiz
+                      - paragraph [ref=e101]:
+                        - img [ref=e102]
+                        - text: Fade americano
+                    - generic [ref=e108]:
+                      - paragraph [ref=e109]:
+                        - img [ref=e110]
+                        - text: Tony
+                      - paragraph [ref=e113]: 30 min
+                  - listitem [ref=e114]:
+                    - generic [ref=e115]: 11:00
+                    - generic [ref=e116]:
+                      - paragraph [ref=e117]: Mario Castro
+                      - paragraph [ref=e118]:
+                        - img [ref=e119]
+                        - text: Diseño + barba
+                    - generic [ref=e125]:
+                      - paragraph [ref=e126]:
+                        - img [ref=e127]
+                        - text: Memo
+                      - paragraph [ref=e130]: 60 min
+                  - listitem [ref=e131]:
+                    - generic [ref=e132]: 12:00
+                    - generic [ref=e133]:
+                      - paragraph [ref=e134]: Andrés Vega
+                      - paragraph [ref=e135]:
+                        - img [ref=e136]
+                        - text: Corte niño
+                    - generic [ref=e142]:
+                      - paragraph [ref=e143]:
+                        - img [ref=e144]
+                        - text: Memo
+                      - paragraph [ref=e147]: 25 min
+                - paragraph [ref=e148]: ❦ Recortado de la edición de hoy ❦
+              - generic [ref=e149]:
+                - generic [ref=e150]:
+                  - paragraph [ref=e151]: Reseña reciente
+                  - paragraph [ref=e152]: ★★★★★
+                - paragraph [ref=e153]: “Agendar con Tony nunca había sido tan fácil. Llegué, me senté y listo.”
+                - paragraph [ref=e154]: — Luis H.
+            - generic [ref=e156]:
+              - generic [ref=e157]: "14"
+              - generic [ref=e158]: Días gratis
+      - generic [ref=e160]:
+        - generic [ref=e161]: §1 · Lo que ofrecemos
+        - generic [ref=e162]: sigue leyendo ↓
+    - generic [ref=e166]:
+      - generic [ref=e167]:
+        - paragraph [ref=e168]: +2,400
+        - paragraph [ref=e169]: citas agendadas en beta
+      - generic [ref=e170]:
+        - paragraph [ref=e171]: 37%
+        - paragraph [ref=e172]: menos no-shows en promedio
+      - generic [ref=e173]:
+        - paragraph [ref=e174]: 4.9/5
+        - paragraph [ref=e175]: satisfacción de fundadores
+      - generic [ref=e176]:
+        - paragraph [ref=e177]: 0%
+        - paragraph [ref=e178]: comisión por cita · siempre
+    - generic [ref=e180]:
+      - generic [ref=e181]:
+        - generic [ref=e182]:
+          - paragraph [ref=e183]: §2 · Todo en un solo lugar
+          - heading "Pensado para los barberos que cortan pelo, no para contadores." [level=2] [ref=e184]:
+            - text: Pensado para los barberos
+            - text: que cortan pelo, no para contadores.
+        - paragraph [ref=e185]: Cada función nace de preguntar a barberos reales qué les duele. No hay feature de más.
+      - generic [ref=e187]:
+        - article [ref=e188]:
+          - generic [ref=e189]:
+            - generic [ref=e190]: I.
+            - img [ref=e192]
+          - heading "Agenda que nunca se empalma" [level=3] [ref=e194]
+          - paragraph [ref=e195]: Vista semanal tipo Google Calendar, pensada para barberos. Bloqueas descansos, marcas no-shows y arrastras citas para moverlas.
+        - article [ref=e196]:
+          - generic [ref=e197]:
+            - generic [ref=e198]: II.
+            - img [ref=e200]
+          - heading "Tu propia página de reservas" [level=3] [ref=e203]
+          - paragraph [ref=e204]: barberapp.mx/tu-nombre. Compártela en Instagram y WhatsApp. Tus clientes agendan 24/7 sin descargar nada.
+        - article [ref=e205]:
+          - generic [ref=e206]:
+            - generic [ref=e207]: III.
+            - img [ref=e209]
+          - heading "Historial de cada cliente" [level=3] [ref=e214]
+          - paragraph [ref=e215]: Qué corte quiso Luis el mes pasado, qué le gustó, cuándo va a regresar. Trato personalizado sin depender de tu memoria.
+        - article [ref=e216]:
+          - generic [ref=e217]:
+            - generic [ref=e218]: IV.
+            - img [ref=e220]
+          - heading "Números que sí entiendes" [level=3] [ref=e222]
+          - paragraph [ref=e223]: Ingresos del día, de la semana, cuántos clientes son nuevos y cuántos regresan. Sin dashboards confusos.
+        - article [ref=e224]:
+          - generic [ref=e225]:
+            - generic [ref=e226]: V.
+            - img [ref=e228]
+          - heading "Recordatorios que reducen faltas" [level=3] [ref=e230]
+          - paragraph [ref=e231]: Avisos automáticos por email — y pronto WhatsApp. Menos no-shows, más ingresos, menos llamadas perdidas.
+        - article [ref=e232]:
+          - generic [ref=e233]:
+            - generic [ref=e234]: VI.
+            - img [ref=e236]
+          - heading "Sin comisiones por cita" [level=3] [ref=e239]
+          - paragraph [ref=e240]: Fresha te cobra por cada reserva online. Aquí pagas un precio fijo al mes. Lo que cobras es tuyo.
+    - generic [ref=e244]:
+      - generic [ref=e245]:
+        - generic [ref=e246]:
+          - paragraph [ref=e247]: §3 · Cómo funciona
+          - heading "De la libreta al celular en una tarde." [level=2] [ref=e248]:
+            - text: De la libreta al celular
+            - text: en una tarde.
+        - paragraph [ref=e249]: Diseñado para que tu cliente de 65 años también pueda agendar sin batallar.
+      - list [ref=e250]:
+        - listitem [ref=e251]:
+          - generic: "01"
+          - generic [ref=e252]:
+            - generic [ref=e253]:
+              - generic [ref=e254]: "01"
+              - generic [ref=e255]: 10 min
+            - heading "Conecta tu barbería" [level=3] [ref=e257]
+            - paragraph [ref=e258]: Registras barberos, servicios y horarios en 10 minutos. El onboarding te guía paso a paso.
+            - generic [ref=e259]: Paso 1 de 3
+        - listitem [ref=e260]:
+          - generic: "02"
+          - generic [ref=e261]:
+            - generic [ref=e262]:
+              - generic [ref=e263]: "02"
+              - generic [ref=e264]: 24/7
+            - heading "Comparte tu link" [level=3] [ref=e266]
+            - paragraph [ref=e267]: barberapp.mx/tu-nombre. Lo pegas en tu Instagram, WhatsApp o flyers. Tus clientes agendan solos.
+            - generic [ref=e268]: Paso 2 de 3
+        - listitem [ref=e269]:
+          - generic: "03"
+          - generic [ref=e270]:
+            - generic [ref=e271]:
+              - generic [ref=e272]: "03"
+              - generic [ref=e273]: $$$
+            - heading "Atiende y cobra" [level=3] [ref=e275]
+            - paragraph [ref=e276]: Tú ves tu agenda en tiempo real. Marcas citas como completadas. Al final del día ves cuánto facturaste.
+            - generic [ref=e277]: Paso 3 de 3
+    - generic [ref=e279]:
+      - generic [ref=e280]:
+        - paragraph [ref=e281]: §4 · Precios en pesos · Sin letra chiquita
+        - heading "Un plan para cada etapa de tu barbería." [level=2] [ref=e282]:
+          - text: Un plan para cada
+          - text: etapa de tu barbería.
+        - paragraph [ref=e283]: Prueba 14 días gratis, sin tarjeta. Cancelas cuando quieras — sin letra chiquita.
+      - generic [ref=e284]:
+        - article [ref=e285]:
+          - generic [ref=e287]:
+            - paragraph [ref=e288]: Plan starter
+            - heading "Starter" [level=3] [ref=e289]
+            - paragraph [ref=e290]: Para el barbero que empieza solo.
+            - generic [ref=e291]:
+              - generic [ref=e292]: $349
+              - generic [ref=e293]: MXN /mes
+            - paragraph [ref=e294]: IVA incluido · Facturación al día 1
+          - list [ref=e295]:
+            - listitem [ref=e296]:
+              - img [ref=e297]
+              - generic [ref=e299]: 1 barbero
+            - listitem [ref=e300]:
+              - img [ref=e301]
+              - generic [ref=e303]: Agenda online ilimitada
+            - listitem [ref=e304]:
+              - img [ref=e305]
+              - generic [ref=e307]: Página pública de reservas
+            - listitem [ref=e308]:
+              - img [ref=e309]
+              - generic [ref=e311]: Recordatorios por email
+            - listitem [ref=e312]:
+              - img [ref=e313]
+              - generic [ref=e315]: Soporte por WhatsApp
+          - link "Elegir plan" [ref=e317] [cursor=pointer]:
+            - /url: /signup?plan=starter
+        - article [ref=e319]:
+          - generic [ref=e321]: Más popular
+          - generic [ref=e322]:
+            - paragraph [ref=e323]: Plan pro
+            - heading "Pro" [level=3] [ref=e324]
+            - paragraph [ref=e325]: Para barberías con equipo.
+            - generic [ref=e326]:
+              - generic [ref=e327]: $649
+              - generic [ref=e328]: MXN /mes
+            - paragraph [ref=e329]: IVA incluido · Facturación al día 1
+          - list [ref=e330]:
+            - listitem [ref=e331]:
+              - img [ref=e332]
+              - generic [ref=e334]: Hasta 5 barberos
+            - listitem [ref=e335]:
+              - img [ref=e336]
+              - generic [ref=e338]: Todo lo del plan Starter
+            - listitem [ref=e339]:
+              - img [ref=e340]
+              - generic [ref=e342]: Historial de clientes
+            - listitem [ref=e343]:
+              - img [ref=e344]
+              - generic [ref=e346]: Reportes de ingresos y asistencia
+            - listitem [ref=e347]:
+              - img [ref=e348]
+              - generic [ref=e350]: Personalización de tu página
+            - listitem [ref=e351]:
+              - img [ref=e352]
+              - generic [ref=e354]: Soporte prioritario
+          - link "Empezar prueba" [ref=e356] [cursor=pointer]:
+            - /url: /signup?plan=pro
+        - article [ref=e358]:
+          - generic [ref=e360]:
+            - paragraph [ref=e361]: Plan premium
+            - heading "Premium" [level=3] [ref=e362]
+            - paragraph [ref=e363]: Para barberías en crecimiento.
+            - generic [ref=e364]:
+              - generic [ref=e365]: $999
+              - generic [ref=e366]: MXN /mes
+            - paragraph [ref=e367]: IVA incluido · Facturación al día 1
+          - list [ref=e368]:
+            - listitem [ref=e369]:
+              - img [ref=e370]
+              - generic [ref=e372]: Barberos ilimitados
+            - listitem [ref=e373]:
+              - img [ref=e374]
+              - generic [ref=e376]: Todo lo del plan Pro
+            - listitem [ref=e377]:
+              - img [ref=e378]
+              - generic [ref=e380]: Reportes avanzados por barbero
+            - listitem [ref=e381]:
+              - img [ref=e382]
+              - generic [ref=e384]: Segmentación de clientes
+            - listitem [ref=e385]:
+              - img [ref=e386]
+              - generic [ref=e388]: Onboarding 1:1 con tu equipo
+            - listitem [ref=e389]:
+              - img [ref=e390]
+              - generic [ref=e392]: Soporte por llamada
+          - link "Elegir plan" [ref=e394] [cursor=pointer]:
+            - /url: /signup?plan=premium
+    - generic [ref=e396]:
+      - generic [ref=e397]:
+        - generic [ref=e398]:
+          - paragraph [ref=e399]: §5 · Lo que dicen los fundadores
+          - heading "Construido mano a mano con barberos reales." [level=2] [ref=e400]:
+            - text: Construido mano a mano
+            - text: con barberos reales.
+        - paragraph [ref=e401]: Cada palabra de aquí abajo proviene de una llamada de viernes por la tarde, no de un focus group.
+      - generic [ref=e402]:
+        - figure "TM Tony Méndez Tony Barber Shop · Hermosillo" [ref=e403]:
+          - generic [ref=e404]: “
+          - blockquote [ref=e405]: Antes llevaba mis citas en una libreta y cada domingo me peleaba con WhatsApp. Ahora mis clientes se apartan solos y yo solo corto.
+          - generic [ref=e407]:
+            - generic [ref=e408]: TM
+            - generic [ref=e409]:
+              - paragraph [ref=e410]: Tony Méndez
+              - paragraph [ref=e411]: Tony Barber Shop · Hermosillo
+        - figure "MR Memo Ruiz Atelier Barber · Cd. Obregón" [ref=e412]:
+          - generic [ref=e413]: “
+          - blockquote [ref=e414]: Los recordatorios bajaron los no-shows como 40%. Ese solo cambio ya pagó la suscripción tres veces.
+          - generic [ref=e416]:
+            - generic [ref=e417]: MR
+            - generic [ref=e418]:
+              - paragraph [ref=e419]: Memo Ruiz
+              - paragraph [ref=e420]: Atelier Barber · Cd. Obregón
+        - figure "CV Carlos Valenzuela La Navaja · Nogales" [ref=e421]:
+          - generic [ref=e422]: “
+          - blockquote [ref=e423]: Metí a mis tres barberos y cada quien ve su agenda desde su celular. Se acabaron los choques de citas.
+          - generic [ref=e425]:
+            - generic [ref=e426]: CV
+            - generic [ref=e427]:
+              - paragraph [ref=e428]: Carlos Valenzuela
+              - paragraph [ref=e429]: La Navaja · Nogales
+    - generic [ref=e431]:
+      - generic [ref=e432]:
+        - paragraph [ref=e433]: §6 · Preguntas frecuentes
+        - heading "¿Lo que te preguntabas?" [level=2] [ref=e434]
+        - generic [ref=e436]: ❦
+      - generic [ref=e437]:
+        - group [ref=e438]:
+          - generic "01 ¿Necesito tarjeta de crédito para la prueba?" [ref=e439] [cursor=pointer]:
+            - generic [ref=e440]:
+              - generic [ref=e441]: "01"
+              - term [ref=e442]: ¿Necesito tarjeta de crédito para la prueba?
+            - generic [ref=e443]: +
+        - group [ref=e444]:
+          - generic "02 ¿Cobran comisión por cada cita?" [ref=e445] [cursor=pointer]:
+            - generic [ref=e446]:
+              - generic [ref=e447]: "02"
+              - term [ref=e448]: ¿Cobran comisión por cada cita?
+            - generic [ref=e449]: +
+        - group [ref=e450]:
+          - generic "03 ¿Pueden usarlo varios barberos a la vez?" [ref=e451] [cursor=pointer]:
+            - generic [ref=e452]:
+              - generic [ref=e453]: "03"
+              - term [ref=e454]: ¿Pueden usarlo varios barberos a la vez?
+            - generic [ref=e455]: +
+        - group [ref=e456]:
+          - generic "04 ¿Qué pasa si cambio de plan?" [ref=e457] [cursor=pointer]:
+            - generic [ref=e458]:
+              - generic [ref=e459]: "04"
+              - term [ref=e460]: ¿Qué pasa si cambio de plan?
+            - generic [ref=e461]: +
+        - group [ref=e462]:
+          - generic "05 ¿Mis clientes necesitan descargar algo?" [ref=e463] [cursor=pointer]:
+            - generic [ref=e464]:
+              - generic [ref=e465]: "05"
+              - term [ref=e466]: ¿Mis clientes necesitan descargar algo?
+            - generic [ref=e467]: +
+        - group [ref=e468]:
+          - generic "06 ¿Tienen soporte en español?" [ref=e469] [cursor=pointer]:
+            - generic [ref=e470]:
+              - generic [ref=e471]: "06"
+              - term [ref=e472]: ¿Tienen soporte en español?
+            - generic [ref=e473]: +
+    - generic [ref=e477]:
+      - generic [ref=e478]:
+        - paragraph [ref=e479]: ❦ Última llamada · Edición fundadores
+        - paragraph [ref=e480]: MMXXVI · Sonora, MX
+      - generic [ref=e481]:
+        - generic [ref=e482]:
+          - paragraph [ref=e483]: Quedan 19 lugares
+          - heading "Sé una de las primeras 20 barberías." [level=2] [ref=e484]:
+            - text: Sé una de las primeras
+            - text: 20 barberías.
+          - paragraph [ref=e485]: Guarda el precio de fundador de por vida y recibe onboarding 1:1 con el equipo que está construyendo esto contigo.
+        - generic [ref=e486]:
+          - link "Apartar mi lugar" [ref=e487] [cursor=pointer]:
+            - /url: /signup
+            - text: Apartar mi lugar
+            - img
+          - paragraph [ref=e488]: 14 días gratis · Cancela cuando quieras
+  - contentinfo [ref=e490]:
+    - generic [ref=e492]:
+      - generic [ref=e493]:
+        - generic [ref=e494]: Colofón · Fin de la edición
+        - generic [ref=e495]: ❦
+        - generic [ref=e496]: MMXXVI · Vol. 1 · No. 4
+      - generic [ref=e497]:
+        - generic [ref=e498]:
+          - link "BarberApp — inicio" [ref=e499] [cursor=pointer]:
+            - /url: /
+            - generic [ref=e504]:
+              - generic [ref=e505]: Barber
+              - generic [ref=e506]: App
+          - paragraph [ref=e507]: La agenda online hecha en México para las barberías que quieren crecer sin comisiones por cita.
+          - paragraph [ref=e508]: Hola@barberapp.mx
+        - generic [ref=e509]:
+          - heading "Producto" [level=3] [ref=e510]
+          - list [ref=e511]:
+            - listitem [ref=e512]:
+              - link "Características" [ref=e513] [cursor=pointer]:
+                - /url: /#caracteristicas
+            - listitem [ref=e514]:
+              - link "Precios" [ref=e515] [cursor=pointer]:
+                - /url: /precios
+            - listitem [ref=e516]:
+              - link "Preguntas frecuentes" [ref=e517] [cursor=pointer]:
+                - /url: /#preguntas
+        - generic [ref=e518]:
+          - heading "Empresa" [level=3] [ref=e519]
+          - list [ref=e520]:
+            - listitem [ref=e521]:
+              - link "Sobre nosotros" [ref=e522] [cursor=pointer]:
+                - /url: /sobre-nosotros
+            - listitem [ref=e523]:
+              - link "Contacto" [ref=e524] [cursor=pointer]:
+                - /url: /contacto
+            - listitem [ref=e525]:
+              - link "Blog" [ref=e526] [cursor=pointer]:
+                - /url: /blog
+        - generic [ref=e527]:
+          - heading "Legal" [level=3] [ref=e528]
+          - list [ref=e529]:
+            - listitem [ref=e530]:
+              - link "Privacidad" [ref=e531] [cursor=pointer]:
+                - /url: /privacidad
+            - listitem [ref=e532]:
+              - link "Términos" [ref=e533] [cursor=pointer]:
+                - /url: /terminos
+      - generic [ref=e534]:
+        - paragraph [ref=e535]: © 2026 BarberApp · Hecho con orgullo en Sonora, México
+        - paragraph [ref=e536]: Impreso en tinta digital
+  - region "Notifications alt+T"
