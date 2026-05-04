@@ -29,36 +29,50 @@ export function FaqSection() {
   return (
     <section
       id="preguntas"
-      className="border-t border-[color:var(--border)] bg-[oklch(0.985_0.008_80)]"
+      className="relative bg-[color:var(--paper-deep)]/40"
     >
-      <div className="mx-auto max-w-4xl px-4 py-20 sm:px-6 lg:py-24">
+      <div className="mx-auto max-w-4xl px-4 py-24 sm:px-6 lg:py-28">
         <div className="text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--muted-foreground)]">
-            Preguntas frecuentes
+          <p className="stamp text-[color:var(--oxblood)]">
+            §6 · Preguntas frecuentes
           </p>
-          <h2 className="mt-3 font-serif text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">
-            ¿Lo que te preguntabas?
+          <h2 className="mt-4 font-display text-[2.6rem] leading-[0.95] tracking-tight text-[color:var(--ink)] ink-press sm:text-[3.6rem]">
+            ¿Lo que te{" "}
+            <span className="italic text-[color:var(--oxblood)]">
+              preguntabas
+            </span>
+            ?
           </h2>
+          <div className="mx-auto mt-5 hairline-with-mark max-w-xs">
+            <span className="font-display text-base italic text-[color:var(--muted-foreground)]">
+              ❦
+            </span>
+          </div>
         </div>
 
-        <dl className="mt-12 divide-y divide-[color:var(--border)] rounded-2xl border border-[color:var(--border)] bg-[color:var(--card)]">
-          {FAQS.map((f) => (
+        <dl className="mt-14 border-t-2 border-double border-[color:var(--ink)]/30">
+          {FAQS.map((f, i) => (
             <details
               key={f.q}
-              className="group px-6 py-5 [&_summary::-webkit-details-marker]:hidden"
+              className="group border-b border-[color:var(--ink)]/15 px-1 py-5 [&_summary::-webkit-details-marker]:hidden"
             >
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-6">
-                <dt className="font-serif text-lg font-semibold leading-snug">
-                  {f.q}
-                </dt>
+              <summary className="flex cursor-pointer list-none items-baseline justify-between gap-6">
+                <div className="flex items-baseline gap-4">
+                  <span className="font-display text-sm italic text-[color:var(--oxblood)]">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <dt className="font-display text-[1.35rem] leading-tight text-[color:var(--ink)]">
+                    {f.q}
+                  </dt>
+                </div>
                 <span
                   aria-hidden
-                  className="inline-flex h-7 w-7 flex-none items-center justify-center rounded-full border border-[color:var(--border)] text-lg leading-none text-[color:var(--muted-foreground)] transition-transform group-open:rotate-45"
+                  className="inline-flex h-7 w-7 flex-none items-center justify-center rounded-full border border-[color:var(--ink)]/40 text-base font-bold leading-none text-[color:var(--ink)] transition-transform group-open:rotate-45 group-open:bg-[color:var(--oxblood)] group-open:text-[color:var(--paper)] group-open:border-[color:var(--oxblood)]"
                 >
                   +
                 </span>
               </summary>
-              <dd className="mt-3 pr-10 text-sm leading-relaxed text-[color:var(--muted-foreground)]">
+              <dd className="mt-3 pl-9 pr-10 font-serif text-[15px] leading-relaxed text-[color:var(--foreground)]/80">
                 {f.a}
               </dd>
             </details>

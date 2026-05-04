@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -c user.email=joseinnit04@outlook.com -c user.name=INNIT4 commit -m \"Initial commit: snapshot of barberapp current state\" --quiet)",
+      "Bash(git -c user.email=joseinnit04@outlook.com -c user.name=INNIT4 commit -m \"Rediseno landing: estetica editorial vintage 'La Gaceta del Barbero'\" --quiet)"
+    ]
+  }
+}

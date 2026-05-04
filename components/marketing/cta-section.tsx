@@ -4,55 +4,83 @@ import { ArrowRight } from "lucide-react";
 
 export function CtaSection({ remaining }: { remaining: number }) {
   return (
-    <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:py-24">
-      <div className="relative overflow-hidden rounded-3xl bg-[color:var(--foreground)] px-8 py-16 text-[color:var(--background)] sm:px-14 lg:px-20">
+    <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:py-28">
+      <div className="relative overflow-hidden border-2 border-[color:var(--ink)] bg-[color:var(--ink)] text-[color:var(--paper)] shadow-[10px_12px_0_var(--oxblood)]">
+        {/* Top barber-pole stripe */}
+        <div aria-hidden className="h-2 barber-pole opacity-95" />
+
+        {/* Halftone */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 [background-image:radial-gradient(circle_at_1px_1px,oklch(0.25_0.02_60)_1px,transparent_0)] [background-size:24px_24px] opacity-40"
-        />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full bg-[oklch(0.55_0.18_25)] opacity-30 blur-3xl"
+          className="pointer-events-none absolute inset-0 text-[color:var(--paper)] halftone [mask-image:radial-gradient(ellipse_at_top_right,black_0%,transparent_60%)]"
         />
 
-        <div className="relative grid gap-8 md:grid-cols-[1.3fr_1fr] md:items-center">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[oklch(0.85_0.1_25)]">
-              {remaining > 0
-                ? `Últimos ${remaining} lugares de fundador`
-                : "Lugares de fundador agotados"}
+        <div className="relative px-7 py-14 sm:px-12 lg:px-16 lg:py-20">
+          {/* Top stamp row */}
+          <div className="mb-10 flex flex-wrap items-center justify-between gap-4 border-b border-[color:var(--paper)]/20 pb-4">
+            <p className="stamp text-[color:var(--brass)]">
+              ❦ Última llamada · Edición fundadores
             </p>
-            <h2 className="mt-3 font-serif text-4xl font-semibold leading-[1.05] tracking-tight sm:text-5xl">
-              {remaining > 0 ? (
-                <>
-                  Sé una de las primeras{" "}
-                  <span className="italic text-[oklch(0.85_0.1_25)]">
-                    20 barberías
-                  </span>{" "}
-                  y guarda el precio de fundador de por vida.
-                </>
-              ) : (
-                "Gracias a las 20 barberías fundadoras. Lista de espera abierta."
-              )}
-            </h2>
+            <p className="text-[10px] uppercase tracking-[0.22em] text-[color:var(--paper)]/60">
+              MMXXVI · Sonora, MX
+            </p>
           </div>
 
-          <div className="flex flex-col gap-3 md:items-end">
-            <Button
-              asChild
-              size="lg"
-              className="h-12 bg-[oklch(0.85_0.1_25)] px-7 text-base text-[oklch(0.2_0.03_25)] hover:bg-[oklch(0.88_0.12_25)]"
-            >
-              <Link href="/signup">
-                {remaining > 0 ? "Apartar mi lugar" : "Unirme a la lista de espera"}
-                <ArrowRight className="ml-1 h-4 w-4" />
-              </Link>
-            </Button>
-            <p className="text-xs text-[oklch(0.75_0.02_60)]">
-              14 días gratis · Cancela cuando quieras
-            </p>
+          <div className="grid gap-10 md:grid-cols-[1.4fr_1fr] md:items-end">
+            <div>
+              <p className="stamp text-[color:var(--brass)]">
+                {remaining > 0
+                  ? `Quedan ${remaining} lugares`
+                  : "Lugares de fundador agotados"}
+              </p>
+              <h2 className="mt-4 font-display text-[2.6rem] leading-[0.95] tracking-tight sm:text-[3.6rem] lg:text-[4.6rem]">
+                {remaining > 0 ? (
+                  <>
+                    Sé una de las primeras
+                    <br />
+                    <span className="italic text-[color:var(--brass)]">
+                      20 barberías
+                    </span>
+                    .
+                  </>
+                ) : (
+                  <>
+                    Gracias a las{" "}
+                    <span className="italic text-[color:var(--brass)]">
+                      20 fundadoras
+                    </span>
+                    . Lista de espera abierta.
+                  </>
+                )}
+              </h2>
+              <p className="mt-5 max-w-md font-serif text-[17px] italic leading-relaxed text-[color:var(--paper)]/75">
+                Guarda el precio de fundador
+                <span className="font-bold not-italic"> de por vida</span> y
+                recibe onboarding 1:1 con el equipo que está construyendo esto
+                contigo.
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-4 md:items-end">
+              <Button
+                asChild
+                size="lg"
+                className="h-13 bg-[color:var(--brass)] px-7 py-3.5 text-[0.85rem] uppercase tracking-[0.18em] text-[color:var(--ink)] shadow-[4px_4px_0_var(--paper)] transition-transform hover:-translate-y-0.5 hover:bg-[color:var(--paper)] hover:shadow-[6px_6px_0_var(--brass)]"
+              >
+                <Link href="/signup">
+                  {remaining > 0 ? "Apartar mi lugar" : "Unirme a la lista"}
+                  <ArrowRight className="ml-1 h-4 w-4" />
+                </Link>
+              </Button>
+              <p className="text-[10px] uppercase tracking-[0.22em] text-[color:var(--paper)]/55">
+                14 días gratis · Cancela cuando quieras
+              </p>
+            </div>
           </div>
         </div>
+
+        {/* Bottom barber-pole stripe */}
+        <div aria-hidden className="h-2 barber-pole opacity-95 [transform:scaleX(-1)]" />
       </div>
     </section>
   );

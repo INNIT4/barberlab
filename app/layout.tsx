@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Fraunces } from "next/font/google";
+import { Inter, Fraunces, DM_Serif_Display } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
@@ -15,6 +15,14 @@ const fraunces = Fraunces({
   subsets: ["latin"],
   display: "swap",
   axes: ["opsz", "SOFT"],
+});
+
+const dmSerifDisplay = DM_Serif_Display({
+  variable: "--font-display",
+  subsets: ["latin"],
+  display: "swap",
+  weight: "400",
+  style: ["normal", "italic"],
 });
 
 export const metadata: Metadata = {
@@ -40,10 +48,10 @@ export default function RootLayout({
     <html
       lang="es-MX"
       suppressHydrationWarning
-      className={`${inter.variable} ${fraunces.variable} h-full antialiased`}
+      className={`${inter.variable} ${fraunces.variable} ${dmSerifDisplay.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-[color:var(--background)] text-[color:var(--foreground)]">
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange>
           {children}
           <Toaster richColors closeButton />
         </ThemeProvider>

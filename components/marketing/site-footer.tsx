@@ -29,28 +29,43 @@ const SECTIONS = [
 
 export function SiteFooter() {
   return (
-    <footer className="mt-24 border-t border-[color:var(--border)] bg-[oklch(0.985_0.005_80)]">
+    <footer className="relative mt-20 border-t-2 border-double border-[color:var(--ink)]/40 bg-[color:var(--paper-deep)]/40">
+      <div aria-hidden className="h-1 bg-[color:var(--oxblood)]" />
+
       <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
-        <div className="grid gap-10 md:grid-cols-[1.2fr_repeat(3,1fr)]">
+        {/* Colophon top row */}
+        <div className="mb-10 flex flex-wrap items-center justify-between gap-2 border-b border-[color:var(--ink)]/15 pb-3 text-[10px] uppercase tracking-[0.22em] text-[color:var(--muted-foreground)]">
+          <span>Colofón · Fin de la edición</span>
+          <span className="font-display text-base italic normal-case tracking-normal text-[color:var(--oxblood)]">
+            ❦
+          </span>
+          <span>MMXXVI · Vol. 1 · No. 4</span>
+        </div>
+
+        <div className="grid gap-12 md:grid-cols-[1.4fr_repeat(3,1fr)]">
           <div className="space-y-4">
             <Logo />
-            <p className="max-w-xs text-sm leading-relaxed text-[color:var(--muted-foreground)]">
+            <p className="max-w-xs font-serif text-[15px] leading-relaxed text-[color:var(--foreground)]/75">
               La agenda online hecha en México para las barberías que quieren
-              crecer sin comisiones por cita.
+              crecer{" "}
+              <span className="italic">sin comisiones por cita</span>.
+            </p>
+            <p className="text-[10px] uppercase tracking-[0.22em] text-[color:var(--muted-foreground)]">
+              Hola@barberapp.mx
             </p>
           </div>
 
           {SECTIONS.map((section) => (
             <div key={section.title}>
-              <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-[color:var(--muted-foreground)]">
+              <h3 className="mb-4 stamp text-[color:var(--oxblood)]">
                 {section.title}
               </h3>
-              <ul className="space-y-2">
+              <ul className="space-y-2.5">
                 {section.links.map((l) => (
                   <li key={l.href}>
                     <Link
                       href={l.href}
-                      className="text-sm text-[color:var(--foreground)] hover:underline"
+                      className="font-serif text-[15px] text-[color:var(--ink)] transition-colors hover:text-[color:var(--oxblood)] hover:underline hover:underline-offset-4"
                     >
                       {l.label}
                     </Link>
@@ -61,9 +76,14 @@ export function SiteFooter() {
           ))}
         </div>
 
-        <div className="mt-12 flex flex-col items-start justify-between gap-4 border-t border-[color:var(--border)] pt-6 text-xs text-[color:var(--muted-foreground)] sm:flex-row sm:items-center">
-          <p>© {new Date().getFullYear()} BarberApp. Hecho con orgullo en Sonora, México.</p>
-          <p>hola@barberapp.mx</p>
+        <div className="mt-14 flex flex-col items-start justify-between gap-3 border-t border-[color:var(--ink)]/15 pt-5 text-[11px] uppercase tracking-[0.18em] text-[color:var(--muted-foreground)] sm:flex-row sm:items-center">
+          <p>
+            © {new Date().getFullYear()} BarberApp · Hecho con orgullo en
+            Sonora, México
+          </p>
+          <p className="font-display text-sm italic normal-case tracking-normal text-[color:var(--ink)]/60">
+            Impreso en tinta digital
+          </p>
         </div>
       </div>
     </footer>

@@ -17,10 +17,10 @@ const APPOINTMENTS: Appointment[] = [
 ];
 
 const TONE_MAP: Record<Appointment["tone"], string> = {
-  amber: "bg-[oklch(0.95_0.07_80)] text-[oklch(0.35_0.1_60)] ring-[oklch(0.85_0.08_80)]",
-  emerald: "bg-[oklch(0.95_0.05_155)] text-[oklch(0.38_0.1_150)] ring-[oklch(0.85_0.06_155)]",
-  rose: "bg-[oklch(0.95_0.05_20)] text-[oklch(0.45_0.15_25)] ring-[oklch(0.88_0.06_20)]",
-  slate: "bg-[oklch(0.96_0.005_80)] text-[oklch(0.35_0.01_80)] ring-[oklch(0.9_0.005_80)]",
+  amber: "border-l-[color:var(--brass-deep)] bg-[oklch(0.96_0.05_85)]",
+  emerald: "border-l-[oklch(0.5_0.12_150)] bg-[oklch(0.96_0.04_150)]",
+  rose: "border-l-[color:var(--oxblood)] bg-[oklch(0.95_0.05_25)]",
+  slate: "border-l-[color:var(--ink)]/60 bg-[oklch(0.95_0.01_60)]",
 };
 
 export function HeroPreview() {
@@ -28,49 +28,54 @@ export function HeroPreview() {
     <div className="relative isolate">
       <div
         aria-hidden
-        className="absolute -inset-6 -z-10 rounded-[28px] bg-gradient-to-br from-[oklch(0.95_0.04_80)] to-[oklch(0.9_0.06_25)] blur-2xl opacity-70"
+        className="absolute -inset-6 -z-10 rounded-[28px] bg-gradient-to-br from-[oklch(0.94_0.05_75)] to-[oklch(0.88_0.06_30)] blur-2xl opacity-60"
       />
 
-      <div className="rotate-[0.5deg] rounded-2xl border border-[color:var(--border)] bg-[color:var(--card)] p-4 shadow-[0_20px_60px_-20px_rgba(60,40,20,0.35)] ring-1 ring-black/5 sm:p-5">
-        <div className="flex items-center justify-between border-b border-[color:var(--border)] pb-3">
-          <div className="flex items-center gap-2">
-            <span className="h-2.5 w-2.5 rounded-full bg-[oklch(0.8_0.12_25)]" />
-            <span className="h-2.5 w-2.5 rounded-full bg-[oklch(0.85_0.1_80)]" />
-            <span className="h-2.5 w-2.5 rounded-full bg-[oklch(0.8_0.12_155)]" />
+      {/* The "clipping" — newspaper-style framed schedule */}
+      <div className="rotate-[-1deg] border-2 border-[color:var(--ink)]/85 bg-[color:var(--paper)] p-4 shadow-[6px_8px_0_var(--ink),0_22px_60px_-20px_oklch(0.18_0.02_50/0.45)] sm:p-5">
+        {/* Masthead inside the clipping */}
+        <div className="flex items-end justify-between border-b-2 border-[color:var(--ink)] pb-2">
+          <div>
+            <p className="font-display text-base leading-none text-[color:var(--ink)]">
+              Agenda del día
+            </p>
+            <p className="mt-1 text-[9px] uppercase tracking-[0.2em] text-[color:var(--muted-foreground)]">
+              Tony Barber Shop · Hermosillo
+            </p>
           </div>
-          <div className="flex items-center gap-1.5 text-xs font-medium text-[color:var(--muted-foreground)]">
-            <Calendar className="h-3.5 w-3.5" />
-            Viernes 3 de mayo
+          <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-[color:var(--ink)]">
+            <Calendar className="h-3 w-3" />
+            Vie · 03 May
           </div>
         </div>
 
-        <div className="mt-4 grid grid-cols-3 gap-2 text-xs">
-          <Stat label="Citas hoy" value="14" accent="slate" />
-          <Stat label="Ingresos" value="$3,240" accent="emerald" />
-          <Stat label="No-shows" value="0" accent="rose" />
+        <div className="mt-3 grid grid-cols-3 gap-2 text-xs">
+          <Stat label="Citas hoy" value="14" />
+          <Stat label="Ingresos" value="$3,240" highlight />
+          <Stat label="No-shows" value="0" />
         </div>
 
-        <ol className="mt-5 space-y-2">
+        <ol className="mt-3 space-y-1.5">
           {APPOINTMENTS.map((a) => (
             <li
               key={a.time}
-              className={`flex items-center gap-3 rounded-lg px-3 py-2.5 ring-1 ${TONE_MAP[a.tone]}`}
+              className={`flex items-center gap-3 rounded-sm border-l-[3px] px-3 py-2 ring-1 ring-[color:var(--ink)]/10 ${TONE_MAP[a.tone]}`}
             >
-              <span className="font-mono text-sm font-semibold tabular-nums">
+              <span className="font-display text-base leading-none tabular-nums text-[color:var(--ink)]">
                 {a.time}
               </span>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-semibold text-[color:var(--foreground)]">
+                <p className="truncate text-[12px] font-semibold text-[color:var(--ink)]">
                   {a.customer}
                 </p>
-                <p className="truncate text-[11px] opacity-80">
-                  <Scissors className="mr-1 inline h-3 w-3" />
+                <p className="mt-0.5 truncate text-[10px] text-[color:var(--ink)]/70">
+                  <Scissors className="mr-1 inline h-2.5 w-2.5" />
                   {a.service}
                 </p>
               </div>
-              <div className="text-right text-[11px]">
-                <p className="inline-flex items-center gap-1 font-medium">
-                  <User2 className="h-3 w-3" />
+              <div className="text-right text-[10px] text-[color:var(--ink)]/80">
+                <p className="inline-flex items-center gap-1 font-semibold uppercase tracking-wider">
+                  <User2 className="h-2.5 w-2.5" />
                   {a.barber}
                 </p>
                 <p className="opacity-70">{a.duration}</p>
@@ -78,16 +83,28 @@ export function HeroPreview() {
             </li>
           ))}
         </ol>
+
+        <p className="mt-3 border-t border-dashed border-[color:var(--ink)]/30 pt-2 text-center text-[9px] uppercase tracking-[0.2em] text-[color:var(--muted-foreground)]">
+          ❦ Recortado de la edición de hoy ❦
+        </p>
       </div>
 
-      <div className="absolute -bottom-6 -left-6 hidden w-56 rotate-[-3deg] rounded-xl border border-[color:var(--border)] bg-[color:var(--card)] p-3 text-xs shadow-xl sm:block">
-        <p className="font-serif text-sm font-semibold">Nueva reseña</p>
-        <p className="mt-1 text-[11px] leading-relaxed text-[color:var(--muted-foreground)]">
-          &ldquo;Agendar con Tony nunca había sido tan fácil. Llegué, me senté y
-          listo.&rdquo;
+      {/* Pinned review note */}
+      <div className="absolute -bottom-7 -left-8 hidden w-60 rotate-[-4deg] border border-[color:var(--ink)]/40 bg-[oklch(0.92_0.06_85)] p-3 text-xs shadow-[3px_5px_0_oklch(0.18_0.02_50/0.25)] sm:block">
+        <div className="flex items-center justify-between border-b border-dashed border-[color:var(--ink)]/30 pb-1.5">
+          <p className="font-display text-sm text-[color:var(--ink)]">
+            Reseña reciente
+          </p>
+          <p className="text-[10px] tracking-wider text-[color:var(--oxblood)]">
+            ★★★★★
+          </p>
+        </div>
+        <p className="mt-2 font-serif text-[11px] italic leading-snug text-[color:var(--ink)]/80">
+          &ldquo;Agendar con Tony nunca había sido tan fácil. Llegué, me senté
+          y listo.&rdquo;
         </p>
-        <p className="mt-2 text-[10px] font-semibold uppercase tracking-wider text-[oklch(0.55_0.18_25)]">
-          ★★★★★ · Luis H.
+        <p className="mt-2 text-[9px] uppercase tracking-[0.18em] text-[color:var(--ink)]/60">
+          — Luis H.
         </p>
       </div>
     </div>
@@ -97,24 +114,24 @@ export function HeroPreview() {
 function Stat({
   label,
   value,
-  accent,
+  highlight,
 }: {
   label: string;
   value: string;
-  accent: "slate" | "emerald" | "rose";
+  highlight?: boolean;
 }) {
-  const color =
-    accent === "emerald"
-      ? "text-[oklch(0.45_0.15_150)]"
-      : accent === "rose"
-      ? "text-[oklch(0.5_0.15_25)]"
-      : "text-[color:var(--foreground)]";
   return (
-    <div className="rounded-lg bg-[oklch(0.98_0.004_80)] p-3 ring-1 ring-[color:var(--border)]">
-      <p className="text-[10px] font-medium uppercase tracking-wider text-[color:var(--muted-foreground)]">
+    <div className="border border-[color:var(--ink)]/15 bg-[color:var(--paper)] px-2 py-2">
+      <p className="text-[8px] font-bold uppercase tracking-[0.16em] text-[color:var(--muted-foreground)]">
         {label}
       </p>
-      <p className={`mt-0.5 font-serif text-xl font-semibold ${color}`}>
+      <p
+        className={`mt-0.5 font-display text-xl leading-none ${
+          highlight
+            ? "text-[color:var(--oxblood)]"
+            : "text-[color:var(--ink)]"
+        }`}
+      >
         {value}
       </p>
     </div>
