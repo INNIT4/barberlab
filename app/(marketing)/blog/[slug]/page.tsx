@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
   if (!post) return { title: "Post no encontrado" };
   return {
-    title: `${post.title} — Blog BarberApp`,
+    title: `${post.title} — Blog BarberLab`,
     description: post.excerpt,
   };
 }

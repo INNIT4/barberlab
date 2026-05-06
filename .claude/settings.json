@@ -3,7 +3,20 @@
     "allow": [
       "Bash(git -c user.email=joseinnit04@outlook.com -c user.name=INNIT4 commit -m \"Initial commit: snapshot of barberapp current state\" --quiet)",
       "Bash(git -c user.email=joseinnit04@outlook.com -c user.name=INNIT4 commit -m \"Rediseno landing: estetica editorial vintage 'La Gaceta del Barbero'\" --quiet)",
-      "Bash(git -c user.email=joseinnit04@outlook.com -c user.name=INNIT4 commit -m \"Fix: registrar tokens de color editorial en theme inline \\(ink/paper/oxblood/brass\\)\" --quiet)"
+      "Bash(git -c user.email=joseinnit04@outlook.com -c user.name=INNIT4 commit -m \"Fix: registrar tokens de color editorial en theme inline \\(ink/paper/oxblood/brass\\)\" --quiet)",
+      "Bash(rm \"c:\\\\Users\\\\josei\\\\barberapp\\\\app\\\\b\\\\[slug]\\\\booking-section.tsx\")",
+      "Read(//c/Users/josei/barberapp/app/b/**)",
+      "PowerShell(cmd /c \"dir /b \"\"c:\\\\Users\\\\josei\\\\barberapp\\\\app\\\\b\\\\[slug]\"\"\")",
+      "PowerShell(cd \"c:\\\\Users\\\\josei\\\\barberapp\" ; npx drizzle-kit migrate 2>&1 ; Write-Host \"EXIT: $LASTEXITCODE\")",
+      "PowerShell(Get-Process -Name \"node\" -ErrorAction SilentlyContinue)",
+      "PowerShell(cmd /c \"dir /b \"\"c:\\\\Users\\\\josei\\\\barberapp\\\\.next\"\"\")",
+      "PowerShell(cmd /c \"dir /b \"\"c:\\\\Users\\\\josei\\\\barberapp\\\\.next\\\\build\"\"\")",
+      "PowerShell(winget install Stripe.StripeCLI 2>&1)",
+      "Bash(Get-Content \"C:\\\\Users\\\\josei\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-josei-barberapp\\\\5a180e99-1c5b-404b-99b4-9708d18d3f31\\\\tasks\\\\bciwszt00.output\" -Wait)",
+      "Bash(Select-String -Pattern \"error TS|✓ Compiled|Failed to compile|Route \\\\\\(|Build failed|build:|warning\" --SimpleMatch)"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\josei\\barberapp\\app\\b\\[slug]"
     ]
   }
 }

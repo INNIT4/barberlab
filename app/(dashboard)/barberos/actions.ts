@@ -74,7 +74,8 @@ export async function createBarberAction(
   _prev: BarberActionState,
   formData: FormData
 ): Promise<BarberActionState> {
-  const { org } = await getCurrentOrg();
+  const { org, role } = await getCurrentOrg();
+  if (role !== "owner") return { error: "Solo el dueño puede agregar barberos" };
 
   const [{ current }] = await db
     .select({ current: count() })
@@ -120,7 +121,8 @@ export async function updateBarberAction(
   _prev: BarberActionState,
   formData: FormData
 ): Promise<BarberActionState> {
-  const { org } = await getCurrentOrg();
+  const { org, role } = await getCurrentOrg();
+  if (role !== "owner") return { error: "Solo el dueño puede editar barberos" };
   const id = formData.get("id");
   if (typeof id !== "string" || !id) {
     return { error: "Barbero inválido" };
@@ -160,7 +162,8 @@ export async function updateBarberAction(
 }
 
 export async function toggleBarberAction(id: string, active: boolean) {
-  const { org } = await getCurrentOrg();
+  const { org, role } = await getCurrentOrg();
+  if (role !== "owner") throw new Error("Solo el dueño puede gestionar barberos");
 
   await db
     .update(barbers)
@@ -171,7 +174,8 @@ export async function toggleBarberAction(id: string, active: boolean) {
 }
 
 export async function deleteBarberAction(id: string) {
-  const { org } = await getCurrentOrg();
+  const { org, role } = await getCurrentOrg();
+  if (role !== "owner") throw new Error("Solo el dueño puede eliminar barberos");
 
   await db
     .delete(barbers)

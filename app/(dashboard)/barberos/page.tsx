@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Link from "next/link";
 import { and, asc, eq, gt, isNull } from "drizzle-orm";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
@@ -17,7 +17,7 @@ import { BarberRowActions } from "./barber-row-actions";
 import { InviteStaffSection } from "./invite-staff";
 
 export const metadata: Metadata = {
-  title: "Barberos — BarberApp",
+  title: "Barberos — BarberLab",
 };
 
 function initials(name: string): string {

@@ -48,7 +48,7 @@ export function SiteHeader() {
               <Link href="/login">Iniciar sesión</Link>
             </Button>
             <Button asChild size="sm" className="stamp-tight bg-[color:var(--ink)] text-[color:var(--paper)] hover:bg-[color:var(--oxblood)]">
-              <Link href="/signup">Probar 14 días</Link>
+              <Link href="/signup">Probar 1 mes</Link>
             </Button>
           </div>
         </div>

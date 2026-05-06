@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useActionState, useState } from "react";
 import Link from "next/link";
@@ -161,7 +161,7 @@ export function SignupForm({
           <Label htmlFor="slug">Tu URL pública</Label>
           <div className="flex items-center rounded-md border border-[color:var(--border)] bg-[oklch(0.985_0.005_80)] focus-within:ring-2 focus-within:ring-[color:var(--ring)]/40">
             <span className="px-3 text-xs text-[color:var(--muted-foreground)]">
-              barberapp.mx/b/
+              barberlab.app/b/
             </span>
             <Input
               id="slug"

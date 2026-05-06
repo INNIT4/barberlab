@@ -1,8 +1,8 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Sobre nosotros — BarberApp",
-  description: "Conoce la historia de BarberApp, hecho en México para barberías mexicanas.",
+  title: "Sobre nosotros — BarberLab",
+  description: "Conoce la historia de BarberLab, hecho en México para barberías mexicanas.",
 };
 
 export default function SobreNosotrosPage() {
@@ -16,7 +16,7 @@ export default function SobreNosotrosPage() {
         <section>
           <h2 className="font-serif text-xl font-semibold">Nuestra historia</h2>
           <p className="mt-3">
-            BarberApp nació en Hermosillo, Sonora, después de ver a docenas de
+            BarberLab nació en Hermosillo, Sonora, después de ver a docenas de
             barberías perder clientes por no llegar a tiempo, olvidar citas y
             depender de libretas para manejar su agenda.
           </p>

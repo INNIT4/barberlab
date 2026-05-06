@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Link from "next/link";
 import { and, eq, gt } from "drizzle-orm";
 import { PLAN_BY_ID, PLANS, type PlanId } from "@/lib/data/plans";
@@ -8,9 +8,9 @@ import { invitations } from "@/lib/db/schema";
 import { SignupForm } from "./signup-form";
 
 export const metadata: Metadata = {
-  title: "Crear cuenta — BarberApp",
+  title: "Crear cuenta — BarberLab",
   description:
-    "Prueba BarberApp 14 días gratis. Sin tarjeta al empezar, cancela cuando quieras.",
+    "Prueba BarberLab 14 días gratis. Sin tarjeta al empezar, cancela cuando quieras.",
 };
 
 const fmt = new Intl.NumberFormat("es-MX", {
@@ -55,7 +55,7 @@ export default async function SignupPage({
           14 días gratis · sin tarjeta
         </span>
         <h1 className="mt-4 font-serif text-3xl font-semibold tracking-tight">
-          Crea tu BarberApp.
+          Crea tu BarberLab.
         </h1>
         <p className="mt-2 text-sm text-[color:var(--muted-foreground)]">
           Tu página pública y agenda listas en menos de 10 minutos.

@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { Logo } from "./logo";
 
 const SECTIONS = [
@@ -51,7 +51,7 @@ export function SiteFooter() {
               <span className="italic">sin comisiones por cita</span>.
             </p>
             <p className="text-[10px] uppercase tracking-[0.22em] text-[color:var(--muted-foreground)]">
-              Hola@barberapp.mx
+              Hola@barberlab.app
             </p>
           </div>
 
@@ -78,7 +78,7 @@ export function SiteFooter() {
 
         <div className="mt-14 flex flex-col items-start justify-between gap-3 border-t border-[color:var(--ink)]/15 pt-5 text-[11px] uppercase tracking-[0.18em] text-[color:var(--muted-foreground)] sm:flex-row sm:items-center">
           <p>
-            © {new Date().getFullYear()} BarberApp · Hecho con orgullo en
+            © {new Date().getFullYear()} BarberLab · Hecho con orgullo en
             Sonora, México
           </p>
           <p className="font-display text-sm italic normal-case tracking-normal text-[color:var(--ink)]/60">

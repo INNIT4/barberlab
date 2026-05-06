@@ -15,6 +15,12 @@ export const serviceSchema = z.object({
     .int("Sin decimales")
     .min(0, "No puede ser negativo")
     .max(100000, "Precio demasiado alto"),
+  imageUrl: z
+    .string()
+    .url("URL inválida")
+    .max(500, "URL demasiado larga")
+    .optional()
+    .or(z.literal("").transform(() => undefined)),
 });
 
 export type ServiceInput = z.infer<typeof serviceSchema>;

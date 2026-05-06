@@ -1,12 +1,12 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { LoginForm } from "./login-form";
 import { signInWithGoogleAction } from "@/app/(auth)/actions";
 
 export const metadata: Metadata = {
-  title: "Iniciar sesión — BarberApp",
-  description: "Accede a tu panel de BarberApp.",
+  title: "Iniciar sesión — BarberLab",
+  description: "Accede a tu panel de BarberLab.",
 };
 
 export default function LoginPage() {

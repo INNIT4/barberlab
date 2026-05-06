@@ -35,7 +35,8 @@ export async function createExpenseAction(
   _prev: ExpenseActionState,
   formData: FormData
 ): Promise<ExpenseActionState> {
-  const { org } = await getCurrentOrg();
+  const { org, role } = await getCurrentOrg();
+  if (role !== "owner") return { error: "Solo el dueño puede registrar gastos" };
 
   const parsed = expenseSchema.safeParse({
     description: formData.get("description"),
@@ -69,7 +70,8 @@ export async function updateExpenseAction(
   _prev: ExpenseActionState,
   formData: FormData
 ): Promise<ExpenseActionState> {
-  const { org } = await getCurrentOrg();
+  const { org, role } = await getCurrentOrg();
+  if (role !== "owner") return { error: "Solo el dueño puede modificar gastos" };
   const id = formData.get("id") as string;
   if (!id) return { error: "Gasto no encontrado" };
 
@@ -108,7 +110,8 @@ export async function updateExpenseAction(
 }
 
 export async function deleteExpenseAction(id: string) {
-  const { org } = await getCurrentOrg();
+  const { org, role } = await getCurrentOrg();
+  if (role !== "owner") throw new Error("Solo el dueño puede eliminar gastos");
   await db
     .delete(expenses)
     .where(and(eq(expenses.id, id), eq(expenses.organizationId, org.id)));

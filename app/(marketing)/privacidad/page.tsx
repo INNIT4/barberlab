@@ -1,9 +1,9 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Aviso de Privacidad — BarberApp",
+  title: "Aviso de Privacidad — BarberLab",
   description:
-    "Aviso de privacidad de BarberApp conforme a la LFPDPPP mexicana.",
+    "Aviso de privacidad de BarberLab conforme a la LFPDPPP mexicana.",
 };
 
 export default function PrivacidadPage() {
@@ -22,11 +22,11 @@ export default function PrivacidadPage() {
             1. Identidad y domicilio del responsable
           </h2>
           <p className="mt-3">
-            BarberApp, con domicilio en Hermosillo, Sonora, México, es el
+            BarberLab, con domicilio en Hermosillo, Sonora, México, es el
             responsable del tratamiento de tus datos personales, en cumplimiento
             con la Ley Federal de Protección de Datos Personales en Posesión de
             los Particulares (LFPDPPP). Para cualquier comunicación relacionada
-            con este aviso, escribe a: hola@barberapp.mx.
+            con este aviso, escribe a: hola@barberlab.app.
           </p>
         </section>
 
@@ -107,7 +107,7 @@ export default function PrivacidadPage() {
           <p className="mt-3">
             Tienes derecho a Acceder, Rectificar, Cancelar y Oponerte al
             tratamiento de tus datos personales (derechos ARCO). Para ejercer
-            estos derechos, envía una solicitud por escrito a hola@barberapp.mx
+            estos derechos, envía una solicitud por escrito a hola@barberlab.app
             con el asunto &ldquo;Derechos ARCO&rdquo;, incluyendo:
           </p>
           <ul className="mt-3 list-disc space-y-2 pl-5">
@@ -162,7 +162,7 @@ export default function PrivacidadPage() {
         <section>
           <h2 className="font-serif text-xl font-semibold">9. Consentimiento</h2>
           <p className="mt-3">
-            Al utilizar BarberApp, manifiestas tu consentimiento para el
+            Al utilizar BarberLab, manifiestas tu consentimiento para el
             tratamiento de tus datos personales conforme a los términos de este
             Aviso de Privacidad. Si no estás de acuerdo, por favor no utilices
             el Servicio.
@@ -173,7 +173,7 @@ export default function PrivacidadPage() {
           <h2 className="font-serif text-xl font-semibold">10. Contacto</h2>
           <p className="mt-3">
             Si tienes dudas sobre este aviso o el tratamiento de tus datos,
-            escríbenos a: hola@barberapp.mx.
+            escríbenos a: hola@barberlab.app.
           </p>
         </section>
       </div>

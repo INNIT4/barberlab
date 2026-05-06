@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { MessageCircle, MapPin } from "lucide-react";
+import { MessageCircle, MapPin, Clock } from "lucide-react";
 import { summarizeWorkingHours, type WorkingHours } from "@/lib/data/working-hours";
 
 export function Hero({
@@ -20,7 +20,10 @@ export function Hero({
   accent: string;
 }) {
   return (
-    <section id="top" className="relative flex min-h-screen flex-col justify-end overflow-hidden pt-20">
+    <section
+      id="top"
+      className="relative flex min-h-[55vh] flex-col justify-end overflow-hidden pt-20 sm:min-h-[60vh]"
+    >
       {heroImageUrl ? (
         <Image
           src={heroImageUrl}
@@ -34,56 +37,63 @@ export function Hero({
         <div
           className="absolute inset-0"
           style={{
-            background: `radial-gradient(circle at 30% 20%, ${accent}22, transparent 60%), oklch(0.15 0.01 60)`,
+            background: `radial-gradient(circle at 30% 20%, ${accent}33, transparent 60%), oklch(0.18 0.02 50)`,
           }}
         />
       )}
 
-      <div className="absolute inset-0 bg-gradient-to-t from-[oklch(0.1_0.01_60)] via-[oklch(0.15_0.01_60)]/60 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[oklch(0.12_0.02_50)] via-[oklch(0.18_0.02_50)]/70 to-transparent" />
 
-      <div className="relative mx-auto w-full max-w-6xl px-6 pb-24 pt-16">
+      <div className="relative mx-auto w-full max-w-6xl px-4 pb-10 pt-12 sm:px-6 sm:pb-14 sm:pt-16">
         <p
-          className="text-xs font-semibold uppercase tracking-[0.2em]"
+          className="text-[10px] font-semibold uppercase tracking-[0.22em]"
           style={{ color: accent }}
         >
           Barbería
         </p>
-        <h1 className="mt-3 max-w-3xl font-serif text-5xl font-semibold leading-[1.05] tracking-tight sm:text-6xl md:text-7xl">
+        <h1 className="mt-2 max-w-3xl break-words font-serif text-3xl font-semibold leading-[1.05] tracking-tight text-[color:var(--paper)] sm:text-5xl md:text-6xl">
           {name}
         </h1>
         {tagline ? (
-          <p className="mt-5 max-w-xl text-lg text-[oklch(0.9_0.02_80)] sm:text-xl">
+          <p className="mt-3 max-w-xl text-balance text-sm text-[oklch(0.92_0.02_80)] sm:mt-4 sm:text-base">
             {tagline}
           </p>
         ) : null}
 
-        <div className="mt-10 flex flex-wrap gap-3">
+        <div className="mt-5 flex flex-wrap gap-2 sm:mt-7 sm:gap-3">
           {whatsappUrl ? (
             <a
               href={whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-full px-6 py-3 font-semibold transition-transform hover:scale-105"
-              style={{ background: accent, color: "oklch(0.15 0.01 60)" }}
+              className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-transform hover:scale-105"
+              style={{ background: accent, color: "var(--paper)" }}
             >
-              <MessageCircle className="h-5 w-5" />
-              Agendar por WhatsApp
+              <MessageCircle className="h-4 w-4" />
+              WhatsApp
             </a>
           ) : null}
+          <a
+            href="#servicios"
+            className="inline-flex items-center gap-2 rounded-full border border-[color:var(--paper)]/40 bg-[oklch(0.18_0.02_50)]/50 px-5 py-2.5 text-sm font-semibold text-[color:var(--paper)] backdrop-blur-sm transition-colors hover:bg-[oklch(0.25_0.02_50)]/70"
+          >
+            Ver servicios
+          </a>
           {address ? (
             <a
               href="#ubicacion"
-              className="inline-flex items-center gap-2 rounded-full border border-[oklch(0.5_0.02_60)] px-6 py-3 font-semibold transition-colors hover:bg-[oklch(0.25_0.02_60)]"
+              className="inline-flex items-center gap-2 rounded-full border border-[color:var(--paper)]/30 px-5 py-2.5 text-sm text-[color:var(--paper)]/90 transition-colors hover:bg-[oklch(0.25_0.02_50)]/40"
             >
-              <MapPin className="h-5 w-5" />
+              <MapPin className="h-4 w-4" />
               Cómo llegar
             </a>
           ) : null}
         </div>
 
         {topBarberHours ? (
-          <p className="mt-8 text-sm text-[oklch(0.85_0.02_80)]">
-            <span className="opacity-70">Horarios: </span>
+          <p className="mt-5 inline-flex items-center gap-2 text-xs text-[oklch(0.88_0.02_80)] sm:text-sm">
+            <Clock className="h-3.5 w-3.5 opacity-70" />
+            <span className="opacity-70">Horarios:</span>{" "}
             {summarizeWorkingHours(topBarberHours)}
           </p>
         ) : null}

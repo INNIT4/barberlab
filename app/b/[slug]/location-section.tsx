@@ -19,36 +19,35 @@ export function LocationSection({
   return (
     <section
       id="ubicacion"
-      className="border-t border-[oklch(0.25_0.02_60)] py-20 sm:py-28"
+      className="border-t border-[color:var(--ink)]/10 bg-[color:var(--paper)] py-16 text-[color:var(--ink)] sm:py-20"
     >
-      <div className="mx-auto max-w-6xl px-6">
-        <header className="mb-12 max-w-2xl">
-          <p
-            className="text-xs font-semibold uppercase tracking-[0.2em]"
-            style={{ color: accent }}
-          >
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <header className="mb-10 max-w-2xl">
+          <p className="stamp" style={{ color: accent }}>
             Visítanos
           </p>
-          <h2 className="mt-3 font-serif text-4xl font-semibold tracking-tight sm:text-5xl">
+          <h2 className="mt-2 font-serif text-3xl font-semibold tracking-tight sm:text-4xl">
             Dónde estamos
           </h2>
         </header>
 
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-4 md:grid-cols-2">
           {address ? (
-            <div className="rounded-2xl border border-[oklch(0.25_0.02_60)] bg-[oklch(0.18_0.01_60)] p-6">
+            <div className="rounded-2xl border border-[color:var(--ink)]/10 bg-[color:var(--card)] p-5 shadow-sm">
               <div className="flex items-start gap-3">
                 <MapPin
                   className="mt-1 h-5 w-5 flex-shrink-0"
                   style={{ color: accent }}
                 />
                 <div className="flex-1">
-                  <p className="text-xs font-semibold uppercase tracking-wider text-[oklch(0.7_0.04_60)]">
+                  <p className="stamp text-[color:var(--muted-foreground)]">
                     Dirección
                   </p>
-                  <p className="mt-1 text-base font-medium">{address}</p>
+                  <p className="mt-1 break-words text-base font-medium">
+                    {address}
+                  </p>
                   {addressNotes ? (
-                    <p className="mt-2 text-sm text-[oklch(0.8_0.02_80)]">
+                    <p className="mt-2 text-sm text-[color:var(--ink)]/70">
                       {addressNotes}
                     </p>
                   ) : null}
@@ -57,7 +56,7 @@ export function LocationSection({
                       href={googleMapsUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mt-4 inline-flex items-center gap-1 text-sm font-semibold"
+                      className="mt-3 inline-flex items-center gap-1 text-sm font-semibold"
                       style={{ color: accent }}
                     >
                       Abrir en Google Maps
@@ -70,23 +69,23 @@ export function LocationSection({
           ) : null}
 
           {phone ? (
-            <div className="rounded-2xl border border-[oklch(0.25_0.02_60)] bg-[oklch(0.18_0.01_60)] p-6">
+            <div className="rounded-2xl border border-[color:var(--ink)]/10 bg-[color:var(--card)] p-5 shadow-sm">
               <div className="flex items-start gap-3">
                 <Phone
                   className="mt-1 h-5 w-5 flex-shrink-0"
                   style={{ color: accent }}
                 />
                 <div className="flex-1">
-                  <p className="text-xs font-semibold uppercase tracking-wider text-[oklch(0.7_0.04_60)]">
+                  <p className="stamp text-[color:var(--muted-foreground)]">
                     Teléfono
                   </p>
                   <a
                     href={`tel:${phone.replace(/\s+/g, "")}`}
-                    className="mt-1 block text-base font-medium transition-colors hover:text-white"
+                    className="mt-1 block text-base font-medium transition-colors hover:opacity-80"
                   >
                     {formatPhoneForDisplay(phone)}
                   </a>
-                  <p className="mt-2 text-sm text-[oklch(0.8_0.02_80)]">
+                  <p className="mt-2 text-sm text-[color:var(--ink)]/70">
                     Llámanos durante nuestros horarios de atención.
                   </p>
                 </div>

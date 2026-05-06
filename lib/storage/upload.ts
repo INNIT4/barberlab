@@ -13,6 +13,17 @@ export async function uploadBrandingImage(
   orgId: string,
   kind: "logo" | "hero"
 ): Promise<UploadResult> {
+  return uploadOrgImage(file, orgId, kind);
+}
+
+/**
+ * Generic uploader for any org-scoped image (logos, hero, services, etc.).
+ */
+export async function uploadOrgImage(
+  file: File,
+  orgId: string,
+  kind: string
+): Promise<UploadResult> {
   if (file.size > 3 * 1024 * 1024) {
     throw new Error("La imagen no puede superar 3 MB");
   }

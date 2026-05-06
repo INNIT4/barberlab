@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useActionState, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -34,7 +34,7 @@ export function OrganizationForm({
   const fieldError = (name: string) => state.fieldErrors?.[name];
 
   function copySlug() {
-    const url = `https://barberapp.mx/b/${slug}`;
+    const url = `https://barberlab.app/b/${slug}`;
     navigator.clipboard.writeText(url).then(
       () => toast.success("URL copiada"),
       () => toast.error("No se pudo copiar")
@@ -66,7 +66,7 @@ export function OrganizationForm({
           <div className="flex items-center gap-2">
             <div className="flex flex-1 items-center rounded-md border border-[color:var(--border)] bg-[oklch(0.985_0.005_80)] focus-within:ring-2 focus-within:ring-[color:var(--ring)]/40">
               <span className="px-3 text-xs text-[color:var(--muted-foreground)]">
-                barberapp.mx/b/
+                barberlab.app/b/
               </span>
               <Input
                 id="slug"

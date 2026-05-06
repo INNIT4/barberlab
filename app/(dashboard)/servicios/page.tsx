@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import { asc, eq } from "drizzle-orm";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { Badge } from "@/components/ui/badge";
@@ -18,7 +18,7 @@ import { NewServiceButton } from "./service-form";
 import { ServiceRowActions } from "./service-row-actions";
 
 export const metadata: Metadata = {
-  title: "Servicios — BarberApp",
+  title: "Servicios — BarberLab",
 };
 
 const CATEGORY_STYLE: Record<string, string> = {
@@ -57,7 +57,7 @@ export default async function ServiciosPage() {
       <DashboardHeader
         title="Servicios"
         subtitle="Lo que ofrecen tus barberos. Ajusta precios y tiempos aquí."
-        action={<NewServiceButton />}
+        action={<NewServiceButton orgId={org.id} />}
       />
 
       <div className="flex-1 overflow-y-auto">
@@ -163,7 +163,7 @@ export default async function ServiciosPage() {
                         )}
                       </TableCell>
                       <TableCell>
-                        <ServiceRowActions service={s} />
+                        <ServiceRowActions service={s} orgId={org.id} />
                       </TableCell>
                     </TableRow>
                   ))}

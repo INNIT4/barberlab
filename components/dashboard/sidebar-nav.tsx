@@ -10,11 +10,13 @@ import {
   BarChart3,
   Settings,
   Receipt,
+  DollarSign,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV = [
   { href: "/agenda", label: "Agenda", icon: Calendar },
+  { href: "/walk-ins", label: "Ventas rápidas", icon: DollarSign },
   { href: "/barberos", label: "Barberos", icon: UserCheck },
   { href: "/servicios", label: "Servicios", icon: Scissors },
   { href: "/clientes", label: "Clientes", icon: Users },

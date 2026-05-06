@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import { and, asc, desc, eq, gte, lt, sql } from "drizzle-orm";
 import { formatInTimeZone, toZonedTime, fromZonedTime } from "date-fns-tz";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
@@ -8,11 +8,13 @@ import { Trash2 } from "lucide-react";
 import { db } from "@/lib/db";
 import { expenses } from "@/lib/db/schema";
 import { getCurrentOrg } from "@/lib/auth/current-user";
+import { canUseExpenses } from "@/lib/features/can";
+import { UpgradeBanner } from "@/components/dashboard/upgrade-banner";
 import { NewExpenseButton, EditExpenseButton } from "./expense-form";
 import { deleteExpenseAction } from "./actions";
 
 export const metadata: Metadata = {
-  title: "Gastos — BarberApp",
+  title: "Gastos — BarberLab",
 };
 
 const fmt = new Intl.NumberFormat("es-MX", {
@@ -45,6 +47,20 @@ export default async function GastosPage({
   searchParams: Promise<{ month?: string }>;
 }) {
   const { org } = await getCurrentOrg();
+
+  if (!canUseExpenses(org.plan)) {
+    return (
+      <>
+        <DashboardHeader title="Gastos" />
+        <UpgradeBanner
+          title="Control de gastos"
+          description="Registra y categoriza los gastos de tu barbería. Disponible en el plan Pro."
+          requiredPlan="Pro"
+        />
+      </>
+    );
+  }
+
   const tz = org.timezone;
   const params = await searchParams;
 

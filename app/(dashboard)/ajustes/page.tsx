@@ -1,27 +1,23 @@
-import type { Metadata } from "next";
-import Link from "next/link";
+﻿import type { Metadata } from "next";
 import { count, eq } from "drizzle-orm";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { PLAN_BY_ID } from "@/lib/data/plans";
 import { db } from "@/lib/db";
 import { barbers, appointments } from "@/lib/db/schema";
 import { getCurrentOrg } from "@/lib/auth/current-user";
-import { formatLimit, maxBarbersFor } from "@/lib/features/can";
+import { formatLimit, maxBarbersFor, canUseBranding } from "@/lib/features/can";
 import { OrganizationForm } from "./organization-form";
 import { BrandingForm } from "./branding-form";
+import { BillingSection } from "./billing-section";
 import { DangerZone } from "./danger-zone";
+import { Lock } from "lucide-react";
+import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Ajustes — BarberApp",
+  title: "Ajustes — BarberLab",
 };
 
-const fmt = new Intl.NumberFormat("es-MX", {
-  style: "currency",
-  currency: "MXN",
-  maximumFractionDigits: 0,
-});
 
 export default async function AjustesPage() {
   const { org } = await getCurrentOrg();
@@ -39,6 +35,7 @@ export default async function AjustesPage() {
 
   const plan = PLAN_BY_ID[org.plan];
   const barberLimit = maxBarbersFor(org.plan);
+  const brandingAllowed = canUseBranding(org.plan);
 
   return (
     <>
@@ -69,11 +66,31 @@ export default async function AjustesPage() {
               </h2>
               <p className="text-sm text-[color:var(--muted-foreground)]">
                 Personaliza tu landing en{" "}
-                <span className="font-mono">barberapp.mx/b/{org.slug}</span>
+                <span className="font-mono">barberlab.app/b/{org.slug}</span>
               </p>
             </div>
 
-            <BrandingForm org={org} />
+            {brandingAllowed ? (
+              <BrandingForm org={org} />
+            ) : (
+              <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-[color:var(--border)] bg-[oklch(0.985_0.005_80)] py-10 text-center">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[color:var(--muted)]">
+                  <Lock className="h-4 w-4 text-[color:var(--muted-foreground)]" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium">Disponible en el plan Pro</p>
+                  <p className="mt-0.5 text-xs text-[color:var(--muted-foreground)]">
+                    Agrega logo, imagen hero, redes sociales y más.
+                  </p>
+                </div>
+                <Link
+                  href="/precios"
+                  className="mt-1 text-xs font-semibold underline underline-offset-2"
+                >
+                  Ver planes →
+                </Link>
+              </div>
+            )}
           </section>
 
           <section className="overflow-hidden rounded-2xl border border-[color:var(--border)] bg-[color:var(--card)] shadow-sm">
@@ -81,15 +98,8 @@ export default async function AjustesPage() {
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <h2 className="font-serif text-xl font-semibold">
-                    Plan y facturación
+                    Plan y estadísticas
                   </h2>
-                  <p className="text-sm text-[color:var(--muted-foreground)]">
-                    Actualmente estás en el plan{" "}
-                    <span className="font-semibold text-[color:var(--foreground)]">
-                      {plan.name}
-                    </span>
-                    .
-                  </p>
                 </div>
                 <Badge className="bg-[oklch(0.96_0.02_25)] text-[oklch(0.45_0.15_25)] hover:bg-[oklch(0.96_0.02_25)]">
                   {plan.name}
@@ -98,28 +108,7 @@ export default async function AjustesPage() {
             </div>
 
             <div className="bg-[oklch(0.985_0.008_80)] px-6 py-5">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <p className="font-serif text-2xl font-semibold">
-                    {fmt.format(plan.priceMxn)}
-                    <span className="ml-1 text-sm font-normal text-[color:var(--muted-foreground)]">
-                      MXN/mes
-                    </span>
-                  </p>
-                  <p className="text-xs text-[color:var(--muted-foreground)]">
-                    {org.trialEndsAt
-                      ? `Tu prueba termina el ${new Intl.DateTimeFormat("es-MX", { dateStyle: "long" }).format(org.trialEndsAt)}`
-                      : "Suscripción activa"}
-                  </p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button variant="outline" asChild>
-                    <Link href="/precios">Cambiar plan</Link>
-                  </Button>
-                </div>
-              </div>
-
-              <div className="mt-5 grid gap-3 border-t border-[color:var(--border)] pt-5 sm:grid-cols-3">
+              <div className="grid gap-3 sm:grid-cols-3">
                 <div>
                   <p className="text-[11px] font-semibold uppercase tracking-wider text-[color:var(--muted-foreground)]">
                     Barberos
@@ -147,6 +136,13 @@ export default async function AjustesPage() {
               </div>
             </div>
           </section>
+
+          <BillingSection
+            plan={org.plan}
+            stripeStatus={org.stripeStatus}
+            stripeCurrentPeriodEnd={org.stripeCurrentPeriodEnd}
+            hasStripe={!!org.stripeCustomerId}
+          />
 
           <DangerZone orgName={org.name} />
         </div>

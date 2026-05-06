@@ -6,6 +6,7 @@ import type { z } from "zod";
 import { db } from "@/lib/db";
 import { organizations } from "@/lib/db/schema";
 import { getCurrentOrg } from "@/lib/auth/current-user";
+import { canUseBranding } from "@/lib/features/can";
 import { brandingSchema, organizationSchema } from "@/lib/validation/organization";
 
 export type OrgActionState = {
@@ -27,7 +28,8 @@ export async function updateOrganizationAction(
   _prev: OrgActionState,
   formData: FormData
 ): Promise<OrgActionState> {
-  const { org } = await getCurrentOrg();
+  const { org, role } = await getCurrentOrg();
+  if (role !== "owner") return { error: "Solo el dueño puede modificar la información del negocio" };
 
   const parsed = organizationSchema.safeParse({
     name: formData.get("name"),
@@ -82,7 +84,12 @@ export async function updateBrandingAction(
   _prev: OrgActionState,
   formData: FormData
 ): Promise<OrgActionState> {
-  const { org } = await getCurrentOrg();
+  const { org, role } = await getCurrentOrg();
+  if (role !== "owner") return { error: "Solo el dueño puede modificar la apariencia" };
+
+  if (!canUseBranding(org.plan)) {
+    return { error: "Necesitas el plan Pro para personalizar tu página." };
+  }
 
   const parsed = brandingSchema.safeParse({
     tagline: formData.get("tagline") ?? "",

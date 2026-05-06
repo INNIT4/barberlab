@@ -3,9 +3,15 @@
 import { revalidatePath } from "next/cache";
 import { and, eq, lt } from "drizzle-orm";
 import { randomBytes } from "node:crypto";
+import { z } from "zod";
 import { db } from "@/lib/db";
 import { invitations } from "@/lib/db/schema";
 import { getCurrentOrg } from "@/lib/auth/current-user";
+import { rateLimit } from "@/lib/rate-limit";
+
+const inviteEmailSchema = z.object({
+  email: z.string().email("Email inválido"),
+});
 
 export type InviteActionState = {
   error?: string;
@@ -18,9 +24,14 @@ export async function createInvitationAction(
   formData: FormData
 ): Promise<InviteActionState> {
   const { org } = await getCurrentOrg();
-  const email = (formData.get("email") as string)?.trim() ?? "";
 
-  if (!email.includes("@") || email.length < 5) {
+  const { allowed } = await rateLimit(`invite:${org.id}`, { maxRequests: 10, windowMs: 24 * 60 * 60_000 });
+  if (!allowed) {
+    return { error: "Límite de invitaciones alcanzado. Intenta mañana." };
+  }
+
+  const parsed = inviteEmailSchema.safeParse({ email: formData.get("email") });
+  if (!parsed.success) {
     return { error: "Ingresa un email válido", fieldErrors: { email: "Email inválido" } };
   }
 
@@ -31,7 +42,7 @@ export async function createInvitationAction(
 
   await db.insert(invitations).values({
     organizationId: org.id,
-    email,
+    email: parsed.data.email,
     role: "staff",
     token,
     expiresAt,
@@ -42,7 +53,8 @@ export async function createInvitationAction(
 }
 
 export async function deleteInvitationAction(id: string) {
-  const { org } = await getCurrentOrg();
+  const { org, role } = await getCurrentOrg();
+  if (role !== "owner") throw new Error("Solo el dueño puede gestionar invitaciones");
   await db
     .delete(invitations)
     .where(

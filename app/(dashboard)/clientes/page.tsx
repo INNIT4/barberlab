@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import { asc, eq } from "drizzle-orm";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { Badge } from "@/components/ui/badge";
@@ -14,11 +14,13 @@ import {
 import { db } from "@/lib/db";
 import { customers } from "@/lib/db/schema";
 import { getCurrentOrg } from "@/lib/auth/current-user";
+import { canViewCustomerHistory, canUseCustomerTags } from "@/lib/features/can";
+import { UpgradeBanner } from "@/components/dashboard/upgrade-banner";
 import { NewCustomerButton } from "./customer-form";
 import { CustomerRowActions } from "./customer-row-actions";
 
 export const metadata: Metadata = {
-  title: "Clientes — BarberApp",
+  title: "Clientes — BarberLab",
 };
 
 const TAG_STYLE: Record<string, string> = {
@@ -39,6 +41,21 @@ function initials(name: string): string {
 export default async function ClientesPage() {
   const { org } = await getCurrentOrg();
 
+  if (!canViewCustomerHistory(org.plan)) {
+    return (
+      <>
+        <DashboardHeader title="Clientes" />
+        <UpgradeBanner
+          title="Historial de clientes"
+          description="Consulta el directorio completo de tus clientes, su historial de citas y preferencias. Disponible en el plan Pro."
+          requiredPlan="Pro"
+        />
+      </>
+    );
+  }
+
+  const showTags = canUseCustomerTags(org.plan);
+
   const directory = await db
     .select()
     .from(customers)
@@ -55,7 +72,7 @@ export default async function ClientesPage() {
       <DashboardHeader
         title="Clientes"
         subtitle="Tu base de clientes con historial y preferencias"
-        action={<NewCustomerButton />}
+        action={<NewCustomerButton showTags={showTags} />}
       />
 
       <div className="flex-1 overflow-y-auto">
@@ -127,7 +144,7 @@ export default async function ClientesPage() {
                     <TableHead>Cliente</TableHead>
                     <TableHead>Teléfono</TableHead>
                     <TableHead>Notas</TableHead>
-                    <TableHead>Segmento</TableHead>
+                    {showTags && <TableHead>Segmento</TableHead>}
                     <TableHead className="w-20"></TableHead>
                   </TableRow>
                 </TableHeader>
@@ -157,22 +174,24 @@ export default async function ClientesPage() {
                       <TableCell className="max-w-[280px] truncate text-xs text-[color:var(--muted-foreground)]">
                         {c.notes ?? "—"}
                       </TableCell>
+                      {showTags && (
+                        <TableCell>
+                          {c.tag ? (
+                            <Badge
+                              variant="secondary"
+                              className={TAG_STYLE[c.tag]}
+                            >
+                              {c.tag}
+                            </Badge>
+                          ) : (
+                            <span className="text-xs text-[color:var(--muted-foreground)]">
+                              —
+                            </span>
+                          )}
+                        </TableCell>
+                      )}
                       <TableCell>
-                        {c.tag ? (
-                          <Badge
-                            variant="secondary"
-                            className={TAG_STYLE[c.tag]}
-                          >
-                            {c.tag}
-                          </Badge>
-                        ) : (
-                          <span className="text-xs text-[color:var(--muted-foreground)]">
-                            —
-                          </span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <CustomerRowActions customer={c} />
+                        <CustomerRowActions customer={c} showTags={showTags} />
                       </TableCell>
                     </TableRow>
                   ))}

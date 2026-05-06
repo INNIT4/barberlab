@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+﻿import type { ReactNode } from "react";
 import Link from "next/link";
 import { Logo } from "@/components/marketing/logo";
 
@@ -41,7 +41,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
       </main>
 
       <footer className="flex flex-wrap items-center justify-between gap-3 px-6 py-6 text-xs text-[color:var(--muted-foreground)] lg:px-10">
-        <p>© {new Date().getFullYear()} BarberApp · Hecho en México</p>
+        <p>© {new Date().getFullYear()} BarberLab · Hecho en México</p>
         <nav className="flex items-center gap-4">
           <Link href="/terminos" className="hover:text-[color:var(--foreground)]">
             Términos

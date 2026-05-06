@@ -42,39 +42,37 @@ export function PublicFooter({
   const hasSocial = instagramUrl || facebookUrl || tiktokUrl;
 
   return (
-    <footer className="border-t border-[oklch(0.25_0.02_60)] bg-[oklch(0.12_0.01_60)] py-14">
-      <div className="mx-auto max-w-6xl px-6">
+    <footer className="border-t-2 border-double border-[color:var(--ink)]/30 bg-[color:var(--paper-deep)]/50 py-12 text-[color:var(--ink)]">
+      <div aria-hidden className="-mt-12 mb-12 h-1" style={{ background: accent }} />
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
         {cancellationPolicy ? (
-          <div className="mb-12 max-w-3xl rounded-2xl border border-[oklch(0.25_0.02_60)] bg-[oklch(0.18_0.01_60)] p-6">
-            <p
-              className="text-xs font-semibold uppercase tracking-wider"
-              style={{ color: accent }}
-            >
+          <div className="mb-10 max-w-3xl rounded-2xl border border-[color:var(--ink)]/10 bg-[color:var(--card)] p-5 shadow-sm">
+            <p className="stamp" style={{ color: accent }}>
               Política de cancelación
             </p>
-            <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-[oklch(0.85_0.02_80)]">
+            <p className="mt-2 whitespace-pre-line break-words text-sm leading-relaxed text-[color:var(--ink)]/80">
               {cancellationPolicy}
             </p>
           </div>
         ) : null}
 
-        <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
+        <div className="flex flex-col items-start justify-between gap-5 sm:flex-row sm:items-center">
           <div>
             <p className="font-serif text-xl font-semibold">{name}</p>
-            <p className="mt-1 text-xs text-[oklch(0.7_0.04_60)]">
+            <p className="mt-1 text-[10px] uppercase tracking-[0.2em] text-[color:var(--muted-foreground)]">
               © {new Date().getFullYear()} · Todos los derechos reservados
             </p>
           </div>
 
           {hasSocial ? (
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               {instagramUrl ? (
                 <a
                   href={instagramUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Instagram"
-                  className="flex h-10 w-10 items-center justify-center rounded-full border border-[oklch(0.3_0.02_60)] transition-colors hover:bg-[oklch(0.25_0.02_60)]"
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--ink)]/15 transition-colors hover:bg-[color:var(--ink)]/5"
                 >
                   <InstagramIcon className="h-4 w-4" />
                 </a>
@@ -85,7 +83,7 @@ export function PublicFooter({
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Facebook"
-                  className="flex h-10 w-10 items-center justify-center rounded-full border border-[oklch(0.3_0.02_60)] transition-colors hover:bg-[oklch(0.25_0.02_60)]"
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--ink)]/15 transition-colors hover:bg-[color:var(--ink)]/5"
                 >
                   <FacebookIcon className="h-4 w-4" />
                 </a>
@@ -96,7 +94,7 @@ export function PublicFooter({
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="TikTok"
-                  className="flex h-10 w-10 items-center justify-center rounded-full border border-[oklch(0.3_0.02_60)] transition-colors hover:bg-[oklch(0.25_0.02_60)]"
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--ink)]/15 transition-colors hover:bg-[color:var(--ink)]/5"
                 >
                   <TikTokIcon className="h-4 w-4" />
                 </a>
@@ -105,10 +103,10 @@ export function PublicFooter({
           ) : null}
         </div>
 
-        <p className="mt-10 text-center text-[11px] uppercase tracking-wider text-[oklch(0.6_0.03_60)]">
+        <p className="mt-8 text-center text-[10px] uppercase tracking-[0.2em] text-[color:var(--muted-foreground)]">
           Powered by{" "}
-          <a href="https://barberapp.mx" className="underline underline-offset-4">
-            BarberApp
+          <a href="https://barberlab.app" className="underline underline-offset-4">
+            BarberLab
           </a>
         </p>
       </div>

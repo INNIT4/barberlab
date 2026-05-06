@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import { count } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { organizations } from "@/lib/db/schema";
@@ -9,7 +9,7 @@ import { CtaSection } from "@/components/marketing/cta-section";
 const MAX_FOUNDERS = 20;
 
 export const metadata: Metadata = {
-  title: "Precios — BarberApp",
+  title: "Precios — BarberLab",
   description:
     "Tres planes pensados para cada etapa de tu barbería. 14 días gratis, sin tarjeta, sin comisiones por cita.",
 };

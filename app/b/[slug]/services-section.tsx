@@ -1,5 +1,9 @@
-import { Clock, MessageCircle } from "lucide-react";
-import type { Service } from "@/lib/db/schema";
+"use client";
+
+import { useMemo, useState } from "react";
+import Image from "next/image";
+import { Clock, Scissors } from "lucide-react";
+import { BookingSheet, type SheetService, type SheetBarber } from "./booking-sheet";
 
 const fmt = new Intl.NumberFormat("es-MX", {
   style: "currency",
@@ -7,100 +11,190 @@ const fmt = new Intl.NumberFormat("es-MX", {
   maximumFractionDigits: 0,
 });
 
-type ServiceLite = Pick<
-  Service,
-  "id" | "name" | "category" | "durationMinutes" | "priceMxn"
->;
-
 const CATEGORY_ORDER = ["Corte", "Barba", "Combo", "Extras"] as const;
 
+export type CatalogService = {
+  id: string;
+  name: string;
+  category: string;
+  durationMinutes: number;
+  priceMxn: number;
+  imageUrl: string | null;
+};
+
 export function ServicesSection({
+  slug,
   services,
-  whatsappUrl,
+  barbers,
   accent,
 }: {
-  services: ServiceLite[];
-  whatsappUrl: string | null;
+  slug: string;
+  services: CatalogService[];
+  barbers: SheetBarber[];
   accent: string;
 }) {
+  const [filter, setFilter] = useState<string>("Todo");
+  const [openService, setOpenService] = useState<SheetService | null>(null);
+
+  const categoriesPresent = useMemo(() => {
+    const set = new Set(services.map((s) => s.category));
+    return CATEGORY_ORDER.filter((c) => set.has(c));
+  }, [services]);
+
+  const filtered =
+    filter === "Todo"
+      ? services
+      : services.filter((s) => s.category === filter);
+
+  const grouped = useMemo(() => {
+    const map = new Map<string, CatalogService[]>();
+    for (const c of categoriesPresent) map.set(c, []);
+    for (const s of filtered) {
+      const list = map.get(s.category) ?? [];
+      list.push(s);
+      map.set(s.category, list);
+    }
+    return map;
+  }, [filtered, categoriesPresent]);
+
   if (services.length === 0) return null;
 
-  const grouped = new Map<string, ServiceLite[]>();
-  for (const cat of CATEGORY_ORDER) grouped.set(cat, []);
-  for (const s of services) {
-    const list = grouped.get(s.category) ?? [];
-    list.push(s);
-    grouped.set(s.category, list);
-  }
-
   return (
-    <section id="servicios" className="border-t border-[oklch(0.25_0.02_60)] py-20 sm:py-28">
-      <div className="mx-auto max-w-6xl px-6">
-        <header className="mb-12 max-w-2xl">
+    <section
+      id="servicios"
+      className="border-t border-[color:var(--ink)]/10 bg-[color:var(--paper)] py-16 text-[color:var(--ink)] sm:py-20"
+    >
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <header className="mb-8 max-w-2xl">
           <p
-            className="text-xs font-semibold uppercase tracking-[0.2em]"
+            className="stamp"
             style={{ color: accent }}
           >
-            Menú
+            Menú de servicios
           </p>
-          <h2 className="mt-3 font-serif text-4xl font-semibold tracking-tight sm:text-5xl">
-            Servicios
+          <h2 className="mt-2 font-serif text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
+            Elige tu servicio y reserva en segundos
           </h2>
         </header>
 
+        {/* Filtros por categoría */}
+        <div className="mb-8 flex flex-wrap gap-2">
+          {(["Todo", ...categoriesPresent] as const).map((c) => {
+            const active = c === filter;
+            return (
+              <button
+                key={c}
+                type="button"
+                onClick={() => setFilter(c)}
+                className={`rounded-full border px-4 py-1.5 text-sm font-medium transition ${
+                  active
+                    ? "border-transparent text-[color:var(--paper)]"
+                    : "border-[color:var(--ink)]/15 hover:border-[color:var(--ink)]/40"
+                }`}
+                style={active ? { background: accent } : undefined}
+              >
+                {c}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Grilla agrupada */}
         <div className="space-y-12">
-          {Array.from(grouped.entries()).map(([category, list]) => {
+          {Array.from(grouped.entries()).map(([cat, list]) => {
             if (list.length === 0) return null;
             return (
-              <div key={category}>
-                <h3 className="mb-5 text-xs font-semibold uppercase tracking-wider text-[oklch(0.7_0.04_60)]">
-                  {category}
-                </h3>
-                <ul className="grid gap-4 sm:grid-cols-2">
-                  {list.map((s) => {
-                    const serviceUrl = whatsappUrl
-                      ? `${whatsappUrl.split("?")[0]}?text=${encodeURIComponent(`Hola, quisiera agendar ${s.name}`)}`
-                      : null;
-                    return (
-                      <li
-                        key={s.id}
-                        className="group relative flex items-start justify-between gap-4 rounded-2xl border border-[oklch(0.25_0.02_60)] bg-[oklch(0.18_0.01_60)] p-5 transition-colors hover:border-[oklch(0.4_0.05_60)]"
-                      >
-                        <div className="min-w-0 flex-1">
-                          <p className="font-serif text-lg font-semibold">
-                            {s.name}
-                          </p>
-                          <p className="mt-1 flex items-center gap-1.5 text-xs text-[oklch(0.75_0.03_60)]">
-                            <Clock className="h-3 w-3" />
-                            {s.durationMinutes} min
-                          </p>
-                        </div>
-                        <div className="flex flex-col items-end gap-2">
-                          <span className="font-serif text-xl font-semibold" style={{ color: accent }}>
-                            {fmt.format(s.priceMxn)}
-                          </span>
-                          {serviceUrl ? (
-                            <a
-                              href={serviceUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 rounded-full bg-[oklch(0.25_0.02_60)] px-3 py-1 text-xs font-medium opacity-0 transition-opacity group-hover:opacity-100"
-                              aria-label={`Agendar ${s.name}`}
-                            >
-                              <MessageCircle className="h-3 w-3" />
-                              Agendar
-                            </a>
-                          ) : null}
-                        </div>
-                      </li>
-                    );
-                  })}
-                </ul>
+              <div key={cat}>
+                <div className="mb-4 flex items-end justify-between border-b border-[color:var(--ink)]/15 pb-2">
+                  <h3 className="font-serif text-xl font-semibold">{cat}</h3>
+                  <span className="text-xs uppercase tracking-wider text-[color:var(--muted-foreground)]">
+                    {list.length} {list.length === 1 ? "servicio" : "servicios"}
+                  </span>
+                </div>
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {list.map((s) => (
+                    <ServiceCard
+                      key={s.id}
+                      service={s}
+                      accent={accent}
+                      onSelect={() => setOpenService(s)}
+                    />
+                  ))}
+                </div>
               </div>
             );
           })}
         </div>
       </div>
+
+      <BookingSheet
+        slug={slug}
+        service={openService}
+        barbers={barbers}
+        accent={accent}
+        open={!!openService}
+        onOpenChange={(v) => {
+          if (!v) setOpenService(null);
+        }}
+      />
     </section>
+  );
+}
+
+function ServiceCard({
+  service,
+  accent,
+  onSelect,
+}: {
+  service: CatalogService;
+  accent: string;
+  onSelect: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      className="group flex flex-col overflow-hidden rounded-2xl border border-[color:var(--ink)]/10 bg-[color:var(--card)] text-left shadow-sm transition hover:-translate-y-0.5 hover:border-[color:var(--ink)]/30 hover:shadow-md"
+    >
+      <div className="relative aspect-[4/3] w-full overflow-hidden bg-[color:var(--paper-deep)]">
+        {service.imageUrl ? (
+          <Image
+            src={service.imageUrl}
+            alt={service.name}
+            fill
+            sizes="(min-width: 1024px) 360px, (min-width: 640px) 50vw, 100vw"
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+        ) : (
+          <div className="flex h-full items-center justify-center text-[color:var(--ink)]/20">
+            <Scissors className="h-10 w-10" />
+          </div>
+        )}
+        <span
+          className="absolute left-3 top-3 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-[color:var(--paper)]"
+          style={{ background: accent }}
+        >
+          {service.category}
+        </span>
+      </div>
+
+      <div className="flex flex-1 flex-col gap-2 p-4">
+        <h4 className="font-serif text-lg font-semibold leading-snug">
+          {service.name}
+        </h4>
+        <div className="mt-auto flex items-center justify-between pt-2">
+          <span className="inline-flex items-center gap-1 text-xs text-[color:var(--muted-foreground)]">
+            <Clock className="h-3 w-3" />
+            {service.durationMinutes} min
+          </span>
+          <span
+            className="font-serif text-lg font-semibold"
+            style={{ color: accent }}
+          >
+            {fmt.format(service.priceMxn)}
+          </span>
+        </div>
+      </div>
+    </button>
   );
 }

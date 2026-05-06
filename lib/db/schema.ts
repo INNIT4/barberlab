@@ -42,6 +42,11 @@ export const organizations = pgTable(
     plan: text("plan", { enum: ["starter", "pro", "premium"] })
       .notNull()
       .default("premium"),
+    stripeCustomerId: text("stripe_customer_id").unique(),
+    stripeSubscriptionId: text("stripe_subscription_id").unique(),
+    stripePriceId: text("stripe_price_id"),
+    stripeStatus: text("stripe_status"),
+    stripeCurrentPeriodEnd: timestamp("stripe_current_period_end", { withTimezone: true }),
     timezone: text("timezone").notNull().default("America/Hermosillo"),
     trialEndsAt: timestamp("trial_ends_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true })
@@ -122,6 +127,7 @@ export const services = pgTable(
       .default("Corte"),
     durationMinutes: integer("duration_minutes").notNull(),
     priceMxn: integer("price_mxn").notNull(),
+    imageUrl: text("image_url"),
     active: boolean("active").notNull().default(true),
     sortOrder: integer("sort_order").notNull().default(0),
     createdAt: timestamp("created_at", { withTimezone: true })
@@ -321,6 +327,35 @@ export const expenses = pgTable(
 );
 
 // ============================================================================
+// walk_ins — ventas sin cita (walk-ins)
+// ============================================================================
+export const walkIns = pgTable(
+  "walk_ins",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    organizationId: uuid("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    barberId: uuid("barber_id").references(() => barbers.id, {
+      onDelete: "set null",
+    }),
+    serviceId: uuid("service_id").references(() => services.id, {
+      onDelete: "set null",
+    }),
+    customerId: uuid("customer_id").references(() => customers.id, {
+      onDelete: "set null",
+    }),
+    priceMxn: integer("price_mxn").notNull(),
+    date: timestamp("date", { withTimezone: true }).notNull().defaultNow(),
+    notes: text("notes"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [index("walk_ins_org_date_idx").on(t.organizationId, t.date)]
+);
+
+// ============================================================================
 // Relations (para drizzle query builder)
 // ============================================================================
 export const organizationsRelations = relations(organizations, ({ many }) => ({
@@ -329,6 +364,7 @@ export const organizationsRelations = relations(organizations, ({ many }) => ({
   services: many(services),
   customers: many(customers),
   appointments: many(appointments),
+  walkIns: many(walkIns),
 }));
 
 export const membershipsRelations = relations(memberships, ({ one }) => ({
@@ -395,6 +431,25 @@ export const expensesRelations = relations(expenses, ({ one }) => ({
   }),
 }));
 
+export const walkInsRelations = relations(walkIns, ({ one }) => ({
+  organization: one(organizations, {
+    fields: [walkIns.organizationId],
+    references: [organizations.id],
+  }),
+  barber: one(barbers, {
+    fields: [walkIns.barberId],
+    references: [barbers.id],
+  }),
+  service: one(services, {
+    fields: [walkIns.serviceId],
+    references: [services.id],
+  }),
+  customer: one(customers, {
+    fields: [walkIns.customerId],
+    references: [customers.id],
+  }),
+}));
+
 export const appointmentsRelations = relations(appointments, ({ one }) => ({
   organization: one(organizations, {
     fields: [appointments.organizationId],
@@ -432,3 +487,5 @@ export type Invitation = typeof invitations.$inferSelect;
 export type Notification = typeof notifications.$inferSelect;
 export type BlogPost = typeof blogPosts.$inferSelect;
 export type Expense = typeof expenses.$inferSelect;
+export type NewWalkIn = typeof walkIns.$inferInsert;
+export type WalkIn = typeof walkIns.$inferSelect;

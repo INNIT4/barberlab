@@ -1,17 +1,17 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import { and, asc, eq, gte, lt } from "drizzle-orm";
 import { formatInTimeZone, fromZonedTime, toZonedTime } from "date-fns-tz";
 import { startOfWeek, addDays } from "date-fns";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { db } from "@/lib/db";
-import { appointments, barbers, services, customers, barberServices } from "@/lib/db/schema";
+import { appointments, barbers, services, customers, barberServices, walkIns } from "@/lib/db/schema";
 import { getCurrentOrg } from "@/lib/auth/current-user";
 import { NewAppointmentButton } from "./new-appointment-dialog";
 import { WeekView } from "./week-view";
 
 export const metadata: Metadata = {
-  title: "Agenda — BarberApp",
+  title: "Agenda — BarberLab",
 };
 
 const fmt = new Intl.NumberFormat("es-MX", {
@@ -110,11 +110,27 @@ export default async function AgendaPage({
     )
     .orderBy(asc(appointments.startsAt));
 
+  const weekWalkIns = await db
+    .select({
+      priceMxn: walkIns.priceMxn,
+    })
+    .from(walkIns)
+    .where(
+      and(
+        eq(walkIns.organizationId, org.id),
+        gte(walkIns.date, weekStart),
+        lt(walkIns.date, weekEnd)
+      )
+    );
+
+  const walkInRevenue = weekWalkIns.reduce((sum, w) => sum + w.priceMxn, 0);
+  const walkInCount = weekWalkIns.length;
+
   const confirmedRevenue = weekAppointments
     .filter((a) => a.status === "completada" || a.status === "confirmada")
-    .reduce((sum, a) => sum + a.priceMxn, 0);
+    .reduce((sum, a) => sum + a.priceMxn, 0) + walkInRevenue;
 
-  const activeCount = weekAppointments.filter((a) => a.status !== "cancelada").length;
+  const activeCount = weekAppointments.filter((a) => a.status !== "cancelada").length + walkInCount;
   const totalMinutes = weekAppointments
     .filter((a) => a.status !== "cancelada")
     .reduce((s, a) => s + (a.serviceDuration ?? 0), 0);
@@ -161,7 +177,7 @@ export default async function AgendaPage({
             <StatCard
               label="Citas de la semana"
               value={String(activeCount)}
-              hint={`${team.length} barberos activos`}
+              hint={`${team.length} barberos activos · inc. walk-ins`}
             />
             <StatCard
               label="Ingresos de la semana"

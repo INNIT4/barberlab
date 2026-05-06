@@ -36,6 +36,13 @@
       "when": 1777789987291,
       "tag": "0004_0004_expenses",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1778029495208,
+      "tag": "0005_nebulous_molecule_man",
+      "breakpoints": true
     }
   ]
 }

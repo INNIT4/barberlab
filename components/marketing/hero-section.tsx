@@ -4,7 +4,7 @@ import { ArrowRight } from "lucide-react";
 import { HeroPreview } from "./hero-preview";
 
 const PROMISES = [
-  { k: "I.", v: "14 días gratis · sin tarjeta" },
+  { k: "I.", v: "1 mes gratis · sin tarjeta" },
   { k: "II.", v: "Cero comisión por cita" },
   { k: "III.", v: "Listo en una tarde" },
 ];
@@ -76,8 +76,8 @@ export function HeroSection() {
                 size="lg"
                 className="h-12 bg-[color:var(--ink)] px-7 text-[0.85rem] uppercase tracking-[0.18em] text-[color:var(--paper)] shadow-[3px_3px_0_var(--oxblood)] transition-transform hover:-translate-y-0.5 hover:bg-[color:var(--oxblood)] hover:shadow-[5px_5px_0_var(--ink)]"
               >
-                <Link href="/signup">
-                  Probar 14 días gratis
+                <Link href="/precios">
+                  Probar 1 mes gratis
                   <ArrowRight className="ml-1 h-4 w-4" />
                 </Link>
               </Button>
@@ -114,9 +114,9 @@ export function HeroSection() {
             {/* Decorative price stamp */}
             <div className="absolute -right-4 -top-6 hidden rotate-12 sm:block">
               <div className="flex h-24 w-24 flex-col items-center justify-center rounded-full border-2 border-dashed border-[color:var(--oxblood)] bg-[color:var(--paper)] text-center text-[color:var(--oxblood)] shadow-[0_4px_18px_oklch(0.18_0.02_50/0.18)]">
-                <span className="font-display text-3xl leading-none">14</span>
+                <span className="font-display text-3xl leading-none">1</span>
                 <span className="mt-0.5 text-[9px] font-bold uppercase tracking-[0.15em]">
-                  Días gratis
+                  Mes gratis
                 </span>
               </div>
             </div>

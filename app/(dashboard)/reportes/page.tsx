@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import { and, desc, eq, gte, lt, sql } from "drizzle-orm";
 import { toZonedTime, fromZonedTime } from "date-fns-tz";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
@@ -6,12 +6,14 @@ import { StatCard } from "@/components/dashboard/stat-card";
 import { RevenueChart, type DayRevenue } from "@/components/dashboard/revenue-chart";
 import { TrendingUp, TrendingDown } from "lucide-react";
 import { db } from "@/lib/db";
-import { appointments, barbers, services, expenses } from "@/lib/db/schema";
+import { appointments, barbers, services, expenses, walkIns } from "@/lib/db/schema";
 import { getCurrentOrg } from "@/lib/auth/current-user";
+import { reportsLevel, canExportData } from "@/lib/features/can";
+import { UpgradeBanner } from "@/components/dashboard/upgrade-banner";
 import { ExportPdfButton } from "./export-button";
 
 export const metadata: Metadata = {
-  title: "Reportes — BarberApp",
+  title: "Reportes — BarberLab",
 };
 
 const fmt = new Intl.NumberFormat("es-MX", {
@@ -25,6 +27,21 @@ const WEEKEND = new Set([0, 6]);
 
 export default async function ReportesPage() {
   const { org } = await getCurrentOrg();
+  const level = reportsLevel(org.plan);
+
+  if (level === "none") {
+    return (
+      <>
+        <DashboardHeader title="Reportes" />
+        <UpgradeBanner
+          title="Reportes de tu barbería"
+          description="Visualiza ingresos, citas completadas y el rendimiento de tu equipo. Disponible en el plan Pro."
+          requiredPlan="Pro"
+        />
+      </>
+    );
+  }
+
   const tz = org.timezone;
 
   const now = new Date();
@@ -57,6 +74,7 @@ export default async function ReportesPage() {
     topSvcs,
     weekRows,
     [expenseTotal],
+    [walkInStats],
   ] = await Promise.all([
     // Current month aggregates
     db
@@ -130,6 +148,21 @@ export default async function ReportesPage() {
           lt(expenses.date, nextMonthStart)
         )
       ),
+
+    // Walk-ins this month
+    db
+      .select({
+        revenue: sql<number>`coalesce(sum(${walkIns.priceMxn}), 0)`,
+        count: sql<number>`count(*)::int`,
+      })
+      .from(walkIns)
+      .where(
+        and(
+          eq(walkIns.organizationId, org.id),
+          gte(walkIns.date, monthStart),
+          lt(walkIns.date, nextMonthStart)
+        )
+      ),
   ]);
 
   const revenueMap = new Map(weekRows.map((r) => [r.dayOfWeek, r.revenue]));
@@ -138,6 +171,9 @@ export default async function ReportesPage() {
     revenue: revenueMap.get(i) ?? 0,
     isWeekend: WEEKEND.has(i),
   }));
+
+  const totalRevenue = monthStats.revenue + walkInStats.revenue;
+  const totalCompleted = monthStats.completed + walkInStats.count;
 
   const growth =
     prevStats.revenue > 0
@@ -151,7 +187,12 @@ export default async function ReportesPage() {
 
   const maxBarberRevenue = Math.max(...barbersPerf.map((b) => b.revenue), 1);
 
-  const netProfit = monthStats.revenue - expenseTotal.total;
+  const avgTicket =
+    totalCompleted > 0
+      ? totalRevenue / totalCompleted
+      : 0;
+
+  const netProfit = totalRevenue - expenseTotal.total;
 
   const monthLabel = new Intl.DateTimeFormat("es-MX", {
     month: "long",
@@ -164,7 +205,7 @@ export default async function ReportesPage() {
       <DashboardHeader
         title="Reportes"
         subtitle={`${monthLabel.charAt(0).toUpperCase() + monthLabel.slice(1)} · ${org.name}`}
-        action={<ExportPdfButton />}
+        action={canExportData(org.plan) ? <ExportPdfButton /> : null}
       />
 
       <div className="flex-1 overflow-y-auto">
@@ -172,7 +213,7 @@ export default async function ReportesPage() {
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
             <StatCard
               label="Ingresos del mes"
-              value={fmt.format(monthStats.revenue)}
+              value={fmt.format(totalRevenue)}
               delta={
                 growth
                   ? {
@@ -198,13 +239,13 @@ export default async function ReportesPage() {
             />
             <StatCard
               label="Citas completadas"
-              value={String(monthStats.completed)}
+              value={String(totalCompleted)}
               hint="este mes"
             />
             <StatCard
               label="Ticket promedio"
-              value={fmt.format(Math.round(monthStats.avgTicket))}
-              hint="citas completadas"
+              value={fmt.format(Math.round(avgTicket))}
+              hint="citas + walk-ins"
             />
             <StatCard
               label="Tasa de cancelación"

@@ -1,4 +1,4 @@
-import {
+﻿import {
   Calendar,
   Users,
   MessageCircle,
@@ -18,7 +18,7 @@ const FEATURES = [
     n: "II",
     icon: Globe,
     title: "Tu propia página de reservas",
-    body: "barberapp.mx/tu-nombre. Compártela en Instagram y WhatsApp. Tus clientes agendan 24/7 sin descargar nada.",
+    body: "barberlab.app/tu-nombre. Compártela en Instagram y WhatsApp. Tus clientes agendan 24/7 sin descargar nada.",
   },
   {
     n: "III",

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import { Inter, Fraunces, DM_Serif_Display } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
@@ -26,12 +26,12 @@ const dmSerifDisplay = DM_Serif_Display({
 });
 
 export const metadata: Metadata = {
-  title: "BarberApp — Sistema de citas para barberías mexicanas",
+  title: "BarberLab — Sistema de citas para barberías mexicanas",
   description:
     "La agenda online que cobra puntual, recuerda cada cita y cuida a tus clientes. Hecho en México, en pesos, sin comisiones por cita.",
-  metadataBase: new URL("https://barberapp.mx"),
+  metadataBase: new URL("https://barberlab.app"),
   openGraph: {
-    title: "BarberApp — La agenda de los barberos de México",
+    title: "BarberLab — La agenda de los barberos de México",
     description:
       "Agenda online, página para tu barbería y control de clientes. Sin comisiones por cita.",
     type: "website",
@@ -47,7 +47,6 @@ export default function RootLayout({
   return (
     <html
       lang="es-MX"
-      suppressHydrationWarning
       className={`${inter.variable} ${fraunces.variable} ${dmSerifDisplay.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-[color:var(--background)] text-[color:var(--foreground)]">

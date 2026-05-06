@@ -1,5 +1,6 @@
 "use server";
 
+import { headers } from "next/headers";
 import { and, eq } from "drizzle-orm";
 import { fromZonedTime } from "date-fns-tz";
 import { z } from "zod";
@@ -16,6 +17,7 @@ import {
   dayKeyFromDate,
   type WorkingHours,
 } from "@/lib/data/working-hours";
+import { rateLimit, getRateLimitKey } from "@/lib/rate-limit";
 
 const bookingSchema = z.object({
   slug: z.string(),
@@ -46,6 +48,13 @@ export async function createPublicBookingAction(
   _prev: BookingState,
   formData: FormData
 ): Promise<BookingState> {
+  const headersList = await headers();
+  const ip = getRateLimitKey(headersList, "booking");
+  const { allowed } = await rateLimit(`booking:${ip}`, { maxRequests: 10, windowMs: 15 * 60_000 });
+  if (!allowed) {
+    return { error: "Demasiadas reservas. Intenta de nuevo en 15 minutos." };
+  }
+
   const parsed = bookingSchema.safeParse({
     slug: formData.get("slug"),
     barberId: formData.get("barberId"),

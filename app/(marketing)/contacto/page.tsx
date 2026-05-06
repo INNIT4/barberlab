@@ -1,7 +1,7 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Contacto — BarberApp",
+  title: "Contacto — BarberLab",
   description: "Escríbenos por WhatsApp o email. Soporte en español para barberías mexicanas.",
 };
 
@@ -32,12 +32,12 @@ export default function ContactoPage() {
         </a>
 
         <a
-          href="mailto:hola@barberapp.mx"
+          href="mailto:hola@barberlab.app"
           className="rounded-2xl border border-[color:var(--border)] bg-[color:var(--card)] p-6 transition-colors hover:bg-[oklch(0.98_0.005_80)]"
         >
           <p className="font-serif text-lg font-semibold">Email</p>
           <p className="mt-1 text-sm text-[color:var(--muted-foreground)]">
-            hola@barberapp.mx
+            hola@barberlab.app
           </p>
           <p className="mt-2 text-xs text-[color:var(--muted-foreground)]">
             Te respondemos en menos de 24 horas.

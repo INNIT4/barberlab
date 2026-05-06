@@ -12,6 +12,7 @@ export type CurrentContext = {
     email: string | null;
   };
   org: Organization;
+  role: "owner" | "staff";
 };
 
 /**
@@ -35,13 +36,17 @@ export const getCurrentOrg = cache(async (): Promise<CurrentContext> => {
   });
 
   if (!membership) {
-    // El user existe en auth.users pero no tiene organización.
-    // Esto solo debería pasar si el signup falló a medias.
     redirect("/signup");
   }
 
   return {
     user: { id: user.id, email: user.email ?? null },
     org: membership.organization,
+    role: membership.role as "owner" | "staff",
   };
 });
+
+export async function isOwner(): Promise<boolean> {
+  const { role } = await getCurrentOrg();
+  return role === "owner";
+}

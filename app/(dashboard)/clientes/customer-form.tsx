@@ -39,7 +39,7 @@ type EditableCustomer = Pick<
 
 type Mode = { mode: "create" } | { mode: "edit"; customer: EditableCustomer };
 
-export function NewCustomerButton() {
+export function NewCustomerButton({ showTags = false }: { showTags?: boolean }) {
   const [open, setOpen] = useState(false);
   return (
     <>
@@ -51,6 +51,7 @@ export function NewCustomerButton() {
         open={open}
         onOpenChange={setOpen}
         config={{ mode: "create" }}
+        showTags={showTags}
       />
     </>
   );
@@ -60,10 +61,12 @@ export function CustomerFormDialog({
   open,
   onOpenChange,
   config,
+  showTags = false,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   config: Mode;
+  showTags?: boolean;
 }) {
   const action =
     config.mode === "create" ? createCustomerAction : updateCustomerAction;
@@ -170,22 +173,24 @@ export function CustomerFormDialog({
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="tag">Segmento</Label>
-            <Select value={tag} onValueChange={setTag} disabled={isPending}>
-              <SelectTrigger id="tag">
-                <SelectValue placeholder="Sin segmento" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value={NO_TAG}>Sin segmento</SelectItem>
-                {CUSTOMER_TAGS.map((t) => (
-                  <SelectItem key={t} value={t}>
-                    {t}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          {showTags && (
+            <div className="space-y-2">
+              <Label htmlFor="tag">Segmento</Label>
+              <Select value={tag} onValueChange={setTag} disabled={isPending}>
+                <SelectTrigger id="tag">
+                  <SelectValue placeholder="Sin segmento" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={NO_TAG}>Sin segmento</SelectItem>
+                  {CUSTOMER_TAGS.map((t) => (
+                    <SelectItem key={t} value={t}>
+                      {t}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           <div className="space-y-2">
             <Label htmlFor="notes">Notas</Label>

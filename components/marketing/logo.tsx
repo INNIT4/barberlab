@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+﻿import { cn } from "@/lib/utils";
 import Link from "next/link";
 
 export function Logo({ className }: { className?: string }) {
@@ -9,7 +9,7 @@ export function Logo({ className }: { className?: string }) {
         "group inline-flex items-center gap-2.5 text-[color:var(--foreground)]",
         className
       )}
-      aria-label="BarberApp — inicio"
+      aria-label="BarberLab — inicio"
     >
       {/* Mini barber pole */}
       <span

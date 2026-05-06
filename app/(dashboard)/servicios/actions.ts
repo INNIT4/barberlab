@@ -20,6 +20,7 @@ function parseFormData(formData: FormData) {
     category: formData.get("category"),
     durationMinutes: formData.get("durationMinutes"),
     priceMxn: formData.get("priceMxn"),
+    imageUrl: formData.get("imageUrl"),
   });
 }
 
@@ -36,7 +37,8 @@ export async function createServiceAction(
   _prev: ServiceActionState,
   formData: FormData
 ): Promise<ServiceActionState> {
-  const { org } = await getCurrentOrg();
+  const { org, role } = await getCurrentOrg();
+  if (role !== "owner") return { error: "Solo el dueño puede agregar servicios" };
   const parsed = parseFormData(formData);
 
   if (!parsed.success) {
@@ -61,6 +63,7 @@ export async function createServiceAction(
     category: parsed.data.category,
     durationMinutes: parsed.data.durationMinutes,
     priceMxn: parsed.data.priceMxn,
+    imageUrl: parsed.data.imageUrl ?? null,
     sortOrder: nextSortOrder,
   });
 
@@ -72,7 +75,8 @@ export async function updateServiceAction(
   _prev: ServiceActionState,
   formData: FormData
 ): Promise<ServiceActionState> {
-  const { org } = await getCurrentOrg();
+  const { org, role } = await getCurrentOrg();
+  if (role !== "owner") return { error: "Solo el dueño puede editar servicios" };
   const id = formData.get("id");
   if (typeof id !== "string" || !id) {
     return { error: "Servicio inválido" };
@@ -93,6 +97,7 @@ export async function updateServiceAction(
       category: parsed.data.category,
       durationMinutes: parsed.data.durationMinutes,
       priceMxn: parsed.data.priceMxn,
+      imageUrl: parsed.data.imageUrl ?? null,
       updatedAt: new Date(),
     })
     .where(and(eq(services.id, id), eq(services.organizationId, org.id)))
@@ -107,7 +112,8 @@ export async function updateServiceAction(
 }
 
 export async function toggleServiceAction(id: string, active: boolean) {
-  const { org } = await getCurrentOrg();
+  const { org, role } = await getCurrentOrg();
+  if (role !== "owner") throw new Error("Solo el dueño puede gestionar servicios");
 
   await db
     .update(services)
@@ -118,7 +124,8 @@ export async function toggleServiceAction(id: string, active: boolean) {
 }
 
 export async function deleteServiceAction(id: string) {
-  const { org } = await getCurrentOrg();
+  const { org, role } = await getCurrentOrg();
+  if (role !== "owner") throw new Error("Solo el dueño puede eliminar servicios");
 
   await db
     .delete(services)

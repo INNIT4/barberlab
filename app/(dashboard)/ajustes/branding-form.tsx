@@ -8,6 +8,7 @@ import { Check } from "lucide-react";
 import { toast } from "sonner";
 import { updateBrandingAction, type OrgActionState } from "./actions";
 import { ImageUpload } from "./image-upload";
+import { ColorPickerField } from "@/components/color-picker-field";
 import type { Organization } from "@/lib/db/schema";
 
 const initialState: OrgActionState = {};
@@ -98,24 +99,12 @@ export function BrandingForm({ org }: { org: BrandingOrg }) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="primaryColor">Color principal</Label>
-        <div className="flex items-center gap-3">
-          <Input
-            id="primaryColor"
-            name="primaryColor"
-            defaultValue={org.primaryColor ?? ""}
-            placeholder="#C85A28 o oklch(0.55 0.18 25)"
-            maxLength={60}
-            disabled={isPending}
-            aria-invalid={!!err("primaryColor")}
-          />
-          {org.primaryColor ? (
-            <span
-              className="h-9 w-9 flex-shrink-0 rounded-md border border-[color:var(--border)]"
-              style={{ background: org.primaryColor }}
-            />
-          ) : null}
-        </div>
+        <Label>Color principal</Label>
+        <ColorPickerField
+          name="primaryColor"
+          defaultValue={org.primaryColor}
+          disabled={isPending}
+        />
         {errMsg("primaryColor")}
       </div>
 

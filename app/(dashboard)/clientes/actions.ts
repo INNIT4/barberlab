@@ -6,6 +6,7 @@ import type { z } from "zod";
 import { db } from "@/lib/db";
 import { customers } from "@/lib/db/schema";
 import { getCurrentOrg } from "@/lib/auth/current-user";
+import { canUseCustomerTags } from "@/lib/features/can";
 import { customerSchema } from "@/lib/validation/customer";
 
 export type CustomerActionState = {
@@ -56,6 +57,8 @@ export async function createCustomerAction(
     };
   }
 
+  const tagAllowed = canUseCustomerTags(org.plan);
+
   try {
     await db.insert(customers).values({
       organizationId: org.id,
@@ -63,7 +66,7 @@ export async function createCustomerAction(
       phone: parsed.data.phone,
       email: parsed.data.email ?? null,
       notes: parsed.data.notes ?? null,
-      tag: parsed.data.tag ?? null,
+      tag: tagAllowed ? (parsed.data.tag ?? null) : null,
     });
   } catch (err) {
     if (isUniqueViolation(err)) {
@@ -97,6 +100,8 @@ export async function updateCustomerAction(
     };
   }
 
+  const tagAllowed = canUseCustomerTags(org.plan);
+
   try {
     const [updated] = await db
       .update(customers)
@@ -105,7 +110,7 @@ export async function updateCustomerAction(
         phone: parsed.data.phone,
         email: parsed.data.email ?? null,
         notes: parsed.data.notes ?? null,
-        tag: parsed.data.tag ?? null,
+        tag: tagAllowed ? (parsed.data.tag ?? null) : null,
         updatedAt: new Date(),
       })
       .where(and(eq(customers.id, id), eq(customers.organizationId, org.id)))

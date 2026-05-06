@@ -1,7 +1,7 @@
 const FAQS = [
   {
     q: "¿Necesito tarjeta de crédito para la prueba?",
-    a: "No. Los 14 días son libres. Si al final no convence, simplemente no conectas método de pago y la cuenta se pausa.",
+    a: "No. El primer mes es libre. Si al final no convence, simplemente no conectas método de pago y la cuenta se pausa.",
   },
   {
     q: "¿Cobran comisión por cada cita?",

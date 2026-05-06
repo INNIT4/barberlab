@@ -2,17 +2,17 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { and, asc, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { barbers, barberServices, organizations, services } from "@/lib/db/schema";
+import { barbers, organizations, services } from "@/lib/db/schema";
 import { buildWhatsAppUrl } from "@/lib/public/whatsapp";
+import type { WorkingHours } from "@/lib/data/working-hours";
 import { PublicNav } from "./public-nav";
 import { Hero } from "./hero";
 import { ServicesSection } from "./services-section";
 import { TeamSection } from "./team-section";
 import { LocationSection } from "./location-section";
 import { PublicFooter } from "./public-footer";
-import { BookingSection } from "./booking-section";
 
-const DEFAULT_ACCENT = "oklch(0.72 0.14 60)";
+const DEFAULT_ACCENT = "#7B1E2B";
 
 async function loadPage(slug: string) {
   const org = await db.query.organizations.findFirst({
@@ -20,7 +20,7 @@ async function loadPage(slug: string) {
   });
   if (!org) return null;
 
-  const [catalog, team, assignments] = await Promise.all([
+  const [catalog, team] = await Promise.all([
     db
       .select()
       .from(services)
@@ -31,24 +31,9 @@ async function loadPage(slug: string) {
       .from(barbers)
       .where(and(eq(barbers.organizationId, org.id), eq(barbers.active, true)))
       .orderBy(asc(barbers.createdAt)),
-    db
-      .select({
-        barberId: barberServices.barberId,
-        serviceId: barberServices.serviceId,
-      })
-      .from(barberServices)
-      .innerJoin(barbers, eq(barberServices.barberId, barbers.id))
-      .where(eq(barbers.organizationId, org.id)),
   ]);
 
-  const serviceIdsByBarber: Record<string, string[]> = {};
-  for (const a of assignments) {
-    const list = serviceIdsByBarber[a.barberId] ?? [];
-    list.push(a.serviceId);
-    serviceIdsByBarber[a.barberId] = list;
-  }
-
-  return { org, catalog, team, serviceIdsByBarber };
+  return { org, catalog, team };
 }
 
 export async function generateMetadata({
@@ -87,7 +72,7 @@ export default async function PublicPage({
   const data = await loadPage(slug);
   if (!data) notFound();
 
-  const { org, catalog, team, serviceIdsByBarber } = data;
+  const { org, catalog, team } = data;
 
   const whatsappUrl = buildWhatsAppUrl(
     org.phone,
@@ -95,7 +80,23 @@ export default async function PublicPage({
   );
 
   const accent = org.primaryColor ?? DEFAULT_ACCENT;
-  const topBarberHours = team[0]?.workingHours ?? null;
+  const topBarberHours = (team[0]?.workingHours ?? null) as WorkingHours | null;
+
+  const sheetBarbers = team.map((b) => ({
+    id: b.id,
+    name: b.name,
+    avatarTone: b.avatarTone,
+    workingHoursAvailable: !!b.workingHours,
+  }));
+
+  const sheetServices = catalog.map((s) => ({
+    id: s.id,
+    name: s.name,
+    category: s.category,
+    durationMinutes: s.durationMinutes,
+    priceMxn: s.priceMxn,
+    imageUrl: s.imageUrl,
+  }));
 
   return (
     <>
@@ -118,15 +119,15 @@ export default async function PublicPage({
         />
 
         {org.about ? (
-          <section className="border-t border-[oklch(0.25_0.02_60)] py-20 sm:py-28">
-            <div className="mx-auto max-w-3xl px-6 text-center">
+          <section className="border-t border-[color:var(--ink)]/10 bg-[color:var(--paper)] py-14 text-[color:var(--ink)] sm:py-20">
+            <div className="mx-auto max-w-3xl px-4 text-center sm:px-6">
               <p
-                className="text-xs font-semibold uppercase tracking-[0.2em]"
+                className="stamp"
                 style={{ color: accent }}
               >
                 Sobre nosotros
               </p>
-              <p className="mt-6 whitespace-pre-line font-serif text-2xl leading-relaxed sm:text-3xl">
+              <p className="mt-4 whitespace-pre-line break-words font-serif text-xl leading-relaxed sm:text-2xl">
                 {org.about}
               </p>
             </div>
@@ -134,23 +135,13 @@ export default async function PublicPage({
         ) : null}
 
         <ServicesSection
-          services={catalog}
-          whatsappUrl={whatsappUrl}
+          slug={org.slug}
+          services={sheetServices}
+          barbers={sheetBarbers}
           accent={accent}
         />
 
         <TeamSection team={team} whatsappUrl={whatsappUrl} accent={accent} />
-
-        <BookingSection
-          slug={org.slug}
-          services={catalog}
-          barbers={team.map((b) => ({
-            id: b.id,
-            name: b.name,
-            avatarTone: b.avatarTone,
-          }))}
-          accent={accent}
-        />
 
         <LocationSection
           address={org.address}

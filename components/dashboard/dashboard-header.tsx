@@ -4,7 +4,6 @@ import { db } from "@/lib/db";
 import { notifications } from "@/lib/db/schema";
 import { getCurrentOrg } from "@/lib/auth/current-user";
 import { UserMenu } from "./user-menu";
-import { ClientSearch } from "./client-search";
 import { NotificationsBell } from "./notifications-bell";
 
 function initials(email: string) {
@@ -57,7 +56,6 @@ export async function DashboardHeader({
 
       <div className="flex items-center gap-2">
         {action}
-        <ClientSearch />
         <NotificationsBell
           notifications={notifs.map((n) => ({
             id: n.id,

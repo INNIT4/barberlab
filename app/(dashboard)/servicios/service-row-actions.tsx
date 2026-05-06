@@ -16,11 +16,13 @@ import type { Service } from "@/lib/db/schema";
 
 export function ServiceRowActions({
   service,
+  orgId,
 }: {
   service: Pick<
     Service,
-    "id" | "name" | "category" | "durationMinutes" | "priceMxn" | "active"
+    "id" | "name" | "category" | "durationMinutes" | "priceMxn" | "active" | "imageUrl"
   >;
+  orgId: string;
 }) {
   const [editOpen, setEditOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -96,6 +98,7 @@ export function ServiceRowActions({
       <ServiceFormDialog
         open={editOpen}
         onOpenChange={setEditOpen}
+        orgId={orgId}
         config={{ mode: "edit", service }}
       />
     </>

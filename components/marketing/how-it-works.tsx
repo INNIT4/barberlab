@@ -1,4 +1,4 @@
-const STEPS = [
+﻿const STEPS = [
   {
     n: "01",
     title: "Conecta tu barbería",
@@ -8,7 +8,7 @@ const STEPS = [
   {
     n: "02",
     title: "Comparte tu link",
-    body: "barberapp.mx/tu-nombre. Lo pegas en tu Instagram, WhatsApp o flyers. Tus clientes agendan solos.",
+    body: "barberlab.app/tu-nombre. Lo pegas en tu Instagram, WhatsApp o flyers. Tus clientes agendan solos.",
     pull: "24/7",
   },
   {

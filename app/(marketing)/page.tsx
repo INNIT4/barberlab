@@ -1,5 +1,7 @@
 import { count } from "drizzle-orm";
 import { db } from "@/lib/db";
+
+export const dynamic = "force-dynamic";
 import { organizations } from "@/lib/db/schema";
 import { HeroSection } from "@/components/marketing/hero-section";
 import { TrustBar } from "@/components/marketing/trust-bar";

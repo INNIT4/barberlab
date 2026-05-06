@@ -1,10 +1,10 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Link from "next/link";
 import { RecuperarForm } from "./form";
 
 export const metadata: Metadata = {
-  title: "Recuperar contraseña — BarberApp",
-  description: "Recupera el acceso a tu cuenta de BarberApp.",
+  title: "Recuperar contraseña — BarberLab",
+  description: "Recupera el acceso a tu cuenta de BarberLab.",
 };
 
 export default function RecuperarPage() {

@@ -7,13 +7,14 @@ import { and, eq, gt } from "drizzle-orm";
 import { createClient } from "@/lib/supabase/server";
 import { db } from "@/lib/db";
 import { organizations, memberships, services, invitations } from "@/lib/db/schema";
+import { rateLimit, getRateLimitKey } from "@/lib/rate-limit";
 
 // ============================================================================
 // Schemas
 // ============================================================================
 const loginSchema = z.object({
   email: z.string().email("Email inválido"),
-  password: z.string().min(1, "Ingresa tu contraseña"),
+  password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres"),
 });
 
 const signupSchema = z.object({
@@ -32,6 +33,12 @@ const signupSchema = z.object({
     ),
 });
 
+const inviteSignupSchema = z.object({
+  email: z.string().email("Email inválido"),
+  password: z.string().min(8, "Mínimo 8 caracteres"),
+  owner: z.string().min(2, "Ingresa tu nombre"),
+});
+
 const updatePasswordSchema = z
   .object({
     password: z.string().min(8, "Mínimo 8 caracteres"),
@@ -41,6 +48,10 @@ const updatePasswordSchema = z
     message: "Las contraseñas no coinciden",
     path: ["confirmPassword"],
   });
+
+const emailSchema = z.object({
+  email: z.string().email("Email inválido"),
+});
 
 // ============================================================================
 // Helpers
@@ -63,16 +74,16 @@ function slugify(input: string): string {
     .slice(0, 40);
 }
 
-async function getSiteUrl(): Promise<string> {
-  if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL;
-  try {
-    const headersList = await headers();
-    const host = headersList.get("host") || "localhost:3000";
-    const proto = process.env.NODE_ENV === "production" ? "https" : "http";
-    return `${proto}://${host}`;
-  } catch {
-    return "http://localhost:3000";
-  }
+function sanitizeError(msg: string): string {
+  // No incluir el error original para evitar leaks de PII en logs
+  return msg;
+}
+
+function getSiteUrl(): string {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? process.env.NEXT_PUBLIC_APP_URL;
+  if (siteUrl) return siteUrl;
+  if (process.env.NODE_ENV !== "production") return "http://localhost:3000";
+  throw new Error("NEXT_PUBLIC_SITE_URL must be set in production");
 }
 
 // ============================================================================
@@ -88,6 +99,13 @@ export async function loginAction(
   _prev: ActionState,
   formData: FormData
 ): Promise<ActionState> {
+  const headersList = await headers();
+  const ip = getRateLimitKey(headersList, "login");
+  const { allowed } = await rateLimit(`login:${ip}`, { maxRequests: 5, windowMs: 60_000 });
+  if (!allowed) {
+    return { error: "Demasiados intentos. Espera un minuto." };
+  }
+
   const parsed = loginSchema.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),
@@ -111,13 +129,22 @@ export async function loginAction(
 // Signup (invite helper)
 // ============================================================================
 async function handleInviteSignup(inviteToken: string, formData: FormData): Promise<ActionState> {
-  const email = (formData.get("email") as string)?.trim() ?? "";
-  const password = (formData.get("password") as string) ?? "";
-  const owner = (formData.get("owner") as string)?.trim() ?? "";
+  const parsed = inviteSignupSchema.safeParse({
+    email: formData.get("email"),
+    password: formData.get("password"),
+    owner: formData.get("owner"),
+  });
 
-  if (!email.includes("@") || password.length < 8 || owner.length < 2) {
-    return { error: "Revisa los datos ingresados" };
+  if (!parsed.success) {
+    const fieldErrors: Record<string, string> = {};
+    parsed.error.issues.forEach((issue) => {
+      const field = issue.path[0] as string;
+      if (!fieldErrors[field]) fieldErrors[field] = issue.message;
+    });
+    return { error: "Revisa los datos ingresados", fieldErrors };
   }
+
+  const { email, password, owner } = parsed.data;
 
   const invitation = await db.query.invitations.findFirst({
     where: and(
@@ -158,8 +185,8 @@ async function handleInviteSignup(inviteToken: string, formData: FormData): Prom
         .set({ acceptedAt: new Date() })
         .where(eq(invitations.id, invitation.id));
     });
-  } catch (err) {
-    console.error("Staff signup failed:", err);
+  } catch {
+    console.error(sanitizeError("Staff signup failed"));
     return { error: "Error uniéndote a la barbería. Intenta de nuevo." };
   }
 
@@ -173,14 +200,19 @@ export async function signupAction(
   _prev: ActionState,
   formData: FormData
 ): Promise<ActionState> {
-  // Verificar si viene con token de invitación (antes que nada)
+  const headersList = await headers();
+  const ip = getRateLimitKey(headersList, "signup");
+  const { allowed } = await rateLimit(`signup:${ip}`, { maxRequests: 3, windowMs: 60 * 60_000 });
+  if (!allowed) {
+    return { error: "Demasiados registros. Intenta más tarde." };
+  }
+
   const inviteToken = (formData.get("invite") as string)?.trim() ?? "";
 
   if (inviteToken) {
     return await handleInviteSignup(inviteToken, formData);
   }
 
-  // Flujo normal: crear nueva barbería
   const rawSlug = (formData.get("slug") as string | null) ?? "";
   const normalizedSlug = slugify(rawSlug || (formData.get("shop") as string) || "");
 
@@ -204,7 +236,6 @@ export async function signupAction(
 
   const data = parsed.data;
 
-  // Flujo normal: crear nueva organización
   const existing = await db.query.organizations.findFirst({
     where: eq(organizations.slug, data.slug),
   });
@@ -215,7 +246,6 @@ export async function signupAction(
     };
   }
 
-  // Crear usuario en Supabase Auth
   const supabase = await createClient();
   const { data: authData, error: authError } = await supabase.auth.signUp({
     email: data.email,
@@ -237,7 +267,6 @@ export async function signupAction(
 
   const userId = authData.user.id;
 
-  // Crear organización + membership + servicios demo (transacción)
   try {
     const trialEnds = new Date();
     trialEnds.setDate(trialEnds.getDate() + 14);
@@ -272,8 +301,8 @@ export async function signupAction(
         }))
       );
     });
-  } catch (err) {
-    console.error("Signup org creation failed:", err);
+  } catch {
+    console.error(sanitizeError("Signup org creation failed"));
     return {
       error: "Error creando la barbería. Intenta de nuevo o contáctanos.",
     };
@@ -298,16 +327,22 @@ export async function resetPasswordAction(
   _prev: ActionState,
   formData: FormData
 ): Promise<ActionState> {
-  const email = (formData.get("email") as string) ?? "";
+  const headersList = await headers();
+  const ip = getRateLimitKey(headersList, "reset");
+  const { allowed } = await rateLimit(`reset:${ip}`, { maxRequests: 3, windowMs: 60_000 });
+  if (!allowed) {
+    return { error: "Demasiados intentos. Espera un minuto." };
+  }
 
-  if (!email.includes("@")) {
+  const parsed = emailSchema.safeParse({ email: formData.get("email") });
+  if (!parsed.success) {
     return { error: "Ingresa un email válido" };
   }
 
   const supabase = await createClient();
-  const siteUrl = await getSiteUrl();
+  const siteUrl = getSiteUrl();
 
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+  const { error } = await supabase.auth.resetPasswordForEmail(parsed.data.email, {
     redirectTo: `${siteUrl}/actualizar-contrasena`,
   });
 
@@ -366,10 +401,17 @@ export async function updatePasswordAction(
 // Google OAuth
 // ============================================================================
 export async function signInWithGoogleAction() {
-  const supabase = await createClient();
-  const siteUrl = await getSiteUrl();
+  const headersList = await headers();
+  const ip = getRateLimitKey(headersList, "google");
+  const { allowed } = await rateLimit(`google:${ip}`, { maxRequests: 5, windowMs: 60_000 });
+  if (!allowed) {
+    redirect("/login?error=rate_limit");
+  }
 
-  const { data, error } = await supabase.auth.signInWithOAuth({
+  const supabase = await createClient();
+  const siteUrl = getSiteUrl();
+
+  const { data } = await supabase.auth.signInWithOAuth({
     provider: "google",
     options: {
       redirectTo: `${siteUrl}/auth/callback`,
@@ -382,10 +424,6 @@ export async function signInWithGoogleAction() {
 
   if (data.url) {
     redirect(data.url);
-  }
-
-  if (error) {
-    redirect("/login?error=google");
   }
 
   redirect("/login?error=google");

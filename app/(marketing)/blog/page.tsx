@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Link from "next/link";
 import { and, asc, desc, eq } from "drizzle-orm";
 import { format } from "date-fns";
@@ -7,7 +7,7 @@ import { db } from "@/lib/db";
 import { blogPosts } from "@/lib/db/schema";
 
 export const metadata: Metadata = {
-  title: "Blog — BarberApp",
+  title: "Blog — BarberLab",
   description:
     "Consejos, noticias y recursos para barberías mexicanas.",
 };

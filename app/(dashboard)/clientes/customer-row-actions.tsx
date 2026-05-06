@@ -16,11 +16,10 @@ import type { Customer } from "@/lib/db/schema";
 
 export function CustomerRowActions({
   customer,
+  showTags = false,
 }: {
-  customer: Pick<
-    Customer,
-    "id" | "name" | "phone" | "email" | "notes" | "tag"
-  >;
+  customer: Pick<Customer, "id" | "name" | "phone" | "email" | "notes" | "tag">;
+  showTags?: boolean;
 }) {
   const [editOpen, setEditOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -51,7 +50,7 @@ export function CustomerRowActions({
         <a
           href={whatsappHref}
           target="_blank"
-          rel="noopener"
+          rel="noopener noreferrer"
           className="rounded-md p-1 text-[color:var(--muted-foreground)] hover:bg-[oklch(0.97_0.005_80)] hover:text-[oklch(0.4_0.15_150)]"
           aria-label="Enviar WhatsApp"
         >
@@ -88,6 +87,7 @@ export function CustomerRowActions({
         open={editOpen}
         onOpenChange={setEditOpen}
         config={{ mode: "edit", customer }}
+        showTags={showTags}
       />
     </>
   );

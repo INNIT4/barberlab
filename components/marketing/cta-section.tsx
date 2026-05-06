@@ -73,7 +73,7 @@ export function CtaSection({ remaining }: { remaining: number }) {
                 </Link>
               </Button>
               <p className="text-[10px] uppercase tracking-[0.22em] text-[color:var(--paper)]/55">
-                14 días gratis · Cancela cuando quieras
+                1 mes gratis · Cancela cuando quieras
               </p>
             </div>
           </div>

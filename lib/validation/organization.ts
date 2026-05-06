@@ -15,6 +15,21 @@ const optionalUrl = z
   .or(z.literal(""))
   .transform((v) => (v && v.length > 0 ? v : undefined));
 
+const mapsUrlSchema = z
+  .string()
+  .url("URL inválida")
+  .refine(
+    (url) =>
+      url.startsWith("https://maps.app.goo.gl/") ||
+      url.startsWith("https://goo.gl/maps/") ||
+      url.startsWith("https://www.google.com/maps/") ||
+      url.startsWith("https://maps.google.com/"),
+    "Solo se permiten URLs de Google Maps"
+  )
+  .optional()
+  .or(z.literal(""))
+  .transform((v) => (v && v.length > 0 ? v : undefined));
+
 export const organizationSchema = z.object({
   name: z.string().min(2, "Ingresa un nombre").max(80, "Máximo 80 caracteres"),
   slug: z
@@ -50,7 +65,7 @@ export const brandingSchema = z.object({
   instagramUrl: optionalUrl,
   facebookUrl: optionalUrl,
   tiktokUrl: optionalUrl,
-  googleMapsUrl: optionalUrl,
+  googleMapsUrl: mapsUrlSchema,
   cancellationPolicy: optionalText(2000),
 });
 

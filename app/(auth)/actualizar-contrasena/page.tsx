@@ -1,8 +1,8 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import { ActualizarContrasenaForm } from "./form";
 
 export const metadata: Metadata = {
-  title: "Nueva contraseña — BarberApp",
+  title: "Nueva contraseña — BarberLab",
   description: "Crea una nueva contraseña para tu cuenta.",
 };
 

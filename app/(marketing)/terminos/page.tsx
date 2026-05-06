@@ -1,9 +1,9 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Términos y Condiciones — BarberApp",
+  title: "Términos y Condiciones — BarberLab",
   description:
-    "Términos y condiciones del servicio BarberApp para barberías en México.",
+    "Términos y condiciones del servicio BarberLab para barberías en México.",
 };
 
 export default function TerminosPage() {
@@ -22,9 +22,9 @@ export default function TerminosPage() {
             1. Aceptación de los términos
           </h2>
           <p className="mt-3">
-            Al acceder o utilizar BarberApp y sus servicios relacionados
+            Al acceder o utilizar BarberLab y sus servicios relacionados
             (&ldquo;el Servicio&rdquo;), aceptas estos Términos y Condiciones.
-            Si no estás de acuerdo, no utilices el Servicio. BarberApp es
+            Si no estás de acuerdo, no utilices el Servicio. BarberLab es
             operado desde México y está dirigido a barberías y negocios de
             cuidado personal en territorio mexicano.
           </p>
@@ -35,7 +35,7 @@ export default function TerminosPage() {
             2. Descripción del Servicio
           </h2>
           <p className="mt-3">
-            BarberApp proporciona una plataforma de gestión de citas y agenda
+            BarberLab proporciona una plataforma de gestión de citas y agenda
             para barberías, que incluye: panel de administración, página pública
             de reservas, gestión de barberos, servicios, clientes y reportes
             (&ldquo;el Servicio&rdquo;). Nos reservamos el derecho de modificar,
@@ -62,7 +62,7 @@ export default function TerminosPage() {
             4. Planes, precios y facturación
           </h2>
           <p className="mt-3">
-            BarberApp ofrece planes de suscripción con precios publicados en
+            BarberLab ofrece planes de suscripción con precios publicados en
             nuestra página de precios. Los precios están expresados en pesos
             mexicanos (MXN) e incluyen IVA. Nos reservamos el derecho de
             modificar los precios con aviso previo de al menos 30 días. Las
@@ -104,8 +104,8 @@ export default function TerminosPage() {
             7. Propiedad intelectual
           </h2>
           <p className="mt-3">
-            BarberApp, su marca, logo, diseño, código fuente y todos los
-            contenidos del Servicio son propiedad exclusiva de BarberApp y están
+            BarberLab, su marca, logo, diseño, código fuente y todos los
+            contenidos del Servicio son propiedad exclusiva de BarberLab y están
             protegidos por las leyes de propiedad intelectual mexicanas e
             internacionales. No adquieres ningún derecho de propiedad sobre el
             Servicio o su contenido, salvo el derecho limitado de uso conforme a
@@ -119,9 +119,9 @@ export default function TerminosPage() {
           </h2>
           <p className="mt-3">
             El Servicio se proporciona &ldquo;tal cual&rdquo; y &ldquo;según
-            disponibilidad&rdquo;. BarberApp no garantiza que el Servicio sea
+            disponibilidad&rdquo;. BarberLab no garantiza que el Servicio sea
             ininterrumpido o libre de errores. En la máxima medida permitida por
-            la ley mexicana, BarberApp no será responsable por daños indirectos,
+            la ley mexicana, BarberLab no será responsable por daños indirectos,
             incidentales, especiales o consecuentes derivados del uso o la
             imposibilidad de uso del Servicio.
           </p>
@@ -143,7 +143,7 @@ export default function TerminosPage() {
           <h2 className="font-serif text-xl font-semibold">10. Contacto</h2>
           <p className="mt-3">
             Para cualquier duda sobre estos términos, contáctanos en:
-            hola@barberapp.mx o vía WhatsApp al +52 662 123 4567.
+            hola@barberlab.app o vía WhatsApp al +52 662 123 4567.
           </p>
         </section>
       </div>

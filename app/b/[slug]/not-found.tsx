@@ -11,13 +11,13 @@ export default function NotFound() {
       </h1>
       <p className="mt-3 max-w-md text-sm text-[oklch(0.8_0.02_60)]">
         La URL que buscas no corresponde a ninguna barbería registrada en
-        BarberApp.
+        BarberLab.
       </p>
       <Link
-        href="https://barberapp.mx"
+        href="https://barberlab.app"
         className="mt-6 rounded-full bg-[oklch(0.98_0.01_80)] px-5 py-2 text-sm font-medium text-[oklch(0.15_0.01_60)] transition-colors hover:bg-white"
       >
-        Ir a BarberApp
+        Ir a BarberLab
       </Link>
     </div>
   );

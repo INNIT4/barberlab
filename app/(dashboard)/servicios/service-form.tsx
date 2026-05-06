@@ -27,18 +27,19 @@ import {
   type ServiceActionState,
 } from "./actions";
 import { SERVICE_CATEGORIES } from "@/lib/validation/service";
+import { ImageUploadField } from "@/components/image-upload-field";
 import type { Service } from "@/lib/db/schema";
 
 const initialState: ServiceActionState = {};
 
 type EditableService = Pick<
   Service,
-  "id" | "name" | "category" | "durationMinutes" | "priceMxn"
+  "id" | "name" | "category" | "durationMinutes" | "priceMxn" | "imageUrl"
 >;
 
 type Mode = { mode: "create" } | { mode: "edit"; service: EditableService };
 
-export function NewServiceButton() {
+export function NewServiceButton({ orgId }: { orgId: string }) {
   const [open, setOpen] = useState(false);
   return (
     <>
@@ -49,6 +50,7 @@ export function NewServiceButton() {
       <ServiceFormDialog
         open={open}
         onOpenChange={setOpen}
+        orgId={orgId}
         config={{ mode: "create" }}
       />
     </>
@@ -58,10 +60,12 @@ export function NewServiceButton() {
 export function ServiceFormDialog({
   open,
   onOpenChange,
+  orgId,
   config,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
+  orgId: string;
   config: Mode;
 }) {
   const action =
@@ -86,19 +90,19 @@ export function ServiceFormDialog({
   const defaults =
     config.mode === "edit"
       ? config.service
-      : { name: "", durationMinutes: 30, priceMxn: 200 };
+      : { name: "", durationMinutes: 30, priceMxn: 200, imageUrl: null as string | null };
 
   const fieldError = (name: string) => state.fieldErrors?.[name];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="font-serif">
             {config.mode === "create" ? "Nuevo servicio" : "Editar servicio"}
           </DialogTitle>
           <DialogDescription>
-            Define nombre, precio y tiempo. Puedes pausarlo después sin borrarlo.
+            Define nombre, precio, tiempo y una foto. Puedes pausarlo después sin borrarlo.
           </DialogDescription>
         </DialogHeader>
 
@@ -106,6 +110,16 @@ export function ServiceFormDialog({
           {config.mode === "edit" ? (
             <input type="hidden" name="id" value={config.service.id} />
           ) : null}
+
+          <ImageUploadField
+            name="imageUrl"
+            label="Foto del servicio"
+            orgId={orgId}
+            kind="service"
+            initialUrl={defaults.imageUrl ?? null}
+            aspect="card"
+            help="Una foto ayuda al cliente a elegir. Recomendado 4:3, máx 3 MB."
+          />
 
           <div className="space-y-2">
             <Label htmlFor="name">Nombre</Label>
