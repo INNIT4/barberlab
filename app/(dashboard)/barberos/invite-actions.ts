@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { and, eq, lt } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { randomBytes } from "node:crypto";
 import { z } from "zod";
 import { db } from "@/lib/db";
@@ -23,7 +23,8 @@ export async function createInvitationAction(
   _prev: InviteActionState,
   formData: FormData
 ): Promise<InviteActionState> {
-  const { org } = await getCurrentOrg();
+  const { org, role } = await getCurrentOrg();
+  if (role !== "owner") return { error: "Solo el dueño puede invitar personal" };
 
   const { allowed } = await rateLimit(`invite:${org.id}`, { maxRequests: 10, windowMs: 24 * 60 * 60_000 });
   if (!allowed) {
@@ -52,9 +53,15 @@ export async function createInvitationAction(
   return { ok: true };
 }
 
-export async function deleteInvitationAction(id: string) {
+export async function deleteInvitationAction(id: string): Promise<InviteActionState | void> {
   const { org, role } = await getCurrentOrg();
-  if (role !== "owner") throw new Error("Solo el dueño puede gestionar invitaciones");
+  if (role !== "owner") return { error: "Solo el dueño puede gestionar invitaciones" };
+
+  if (!z.string().uuid().safeParse(id).success) return { error: "Invitación inválida" };
+
+  const { allowed } = await rateLimit(`invite-delete:${org.id}`, { maxRequests: 20, windowMs: 60_000 });
+  if (!allowed) return { error: "Demasiados intentos. Espera un minuto." };
+
   await db
     .delete(invitations)
     .where(

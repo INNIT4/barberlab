@@ -23,9 +23,11 @@ function slugify(input: string): string {
 export function SignupForm({
   inviteToken,
   inviteOrgName,
+  planId,
 }: {
   inviteToken?: string;
   inviteOrgName?: string | null;
+  planId?: string;
 }) {
   const isInvite = inviteOrgName != null && inviteToken != null;
 
@@ -52,6 +54,7 @@ export function SignupForm({
   return (
     <form action={formAction} className="space-y-5">
       {inviteToken ? <input type="hidden" name="invite" value={inviteToken} /> : null}
+      {planId ? <input type="hidden" name="plan" value={planId} /> : null}
 
       {isInvite ? (
         <div className="rounded-lg border border-[oklch(0.85_0.06_150)] bg-[oklch(0.97_0.03_150)] px-3 py-2 text-sm text-[oklch(0.35_0.12_150)]">
@@ -220,7 +223,7 @@ export function SignupForm({
       ) : null}
 
       <Button className="w-full" size="lg" type="submit" disabled={isPending}>
-        {isPending ? "Creando tu cuenta..." : "Empezar prueba de 14 días"}
+        {isPending ? "Creando tu cuenta..." : "Empezar prueba de 1 mes"}
         {!isPending && <ArrowRight className="ml-1 h-4 w-4" />}
       </Button>
     </form>

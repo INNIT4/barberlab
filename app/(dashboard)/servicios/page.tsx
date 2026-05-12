@@ -28,11 +28,7 @@ const CATEGORY_STYLE: Record<string, string> = {
   Extras: "bg-[oklch(0.96_0.02_240)] text-[oklch(0.4_0.1_240)]",
 };
 
-const fmt = new Intl.NumberFormat("es-MX", {
-  style: "currency",
-  currency: "MXN",
-  maximumFractionDigits: 0,
-});
+import { mxnCurrency } from "@/lib/formatters";
 
 export default async function ServiciosPage() {
   const { org } = await getCurrentOrg();
@@ -79,7 +75,7 @@ export default async function ServiciosPage() {
                 Precio promedio
               </p>
               <p className="mt-2 font-serif text-3xl font-semibold">
-                {fmt.format(avgPrice)}
+                {mxnCurrency.format(avgPrice)}
               </p>
               <p className="mt-1 text-xs text-[color:var(--muted-foreground)]">
                 antes de propina
@@ -151,7 +147,7 @@ export default async function ServiciosPage() {
                         </span>
                       </TableCell>
                       <TableCell className="text-right font-serif text-base font-semibold">
-                        {fmt.format(s.priceMxn)}
+                        {mxnCurrency.format(s.priceMxn)}
                       </TableCell>
                       <TableCell>
                         {s.active ? (

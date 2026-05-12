@@ -3,11 +3,7 @@ import { PLANS } from "@/lib/data/plans";
 import { cn } from "@/lib/utils";
 import { CheckoutButton } from "@/app/(marketing)/precios/checkout-button";
 
-const priceFormatter = new Intl.NumberFormat("es-MX", {
-  style: "currency",
-  currency: "MXN",
-  maximumFractionDigits: 0,
-});
+import { mxnCurrency } from "@/lib/formatters";
 
 export function PricingSection({ compact = false }: { compact?: boolean }) {
   return (
@@ -79,7 +75,7 @@ export function PricingSection({ compact = false }: { compact?: boolean }) {
 
               <div className="mt-6 flex items-baseline gap-1.5 border-y border-dashed border-[color:var(--ink)]/30 py-4">
                 <span className="font-display text-[3.2rem] leading-none tracking-tight text-[color:var(--ink)]">
-                  {priceFormatter.format(plan.priceMxn)}
+                  {mxnCurrency.format(plan.priceMxn)}
                 </span>
                 <span className="text-xs uppercase tracking-[0.16em] text-[color:var(--muted-foreground)]">
                   MXN /mes

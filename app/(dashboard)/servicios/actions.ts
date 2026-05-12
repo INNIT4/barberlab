@@ -1,12 +1,15 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 import { and, desc, eq } from "drizzle-orm";
-import type { z } from "zod";
+import { z } from "zod";
 import { db } from "@/lib/db";
 import { services } from "@/lib/db/schema";
 import { getCurrentOrg } from "@/lib/auth/current-user";
 import { serviceSchema } from "@/lib/validation/service";
+import { buildFieldErrors } from "@/lib/validation/helpers";
+import { rateLimit, getRateLimitKey } from "@/lib/rate-limit";
 
 export type ServiceActionState = {
   error?: string;
@@ -24,21 +27,18 @@ function parseFormData(formData: FormData) {
   });
 }
 
-function buildFieldErrors(issues: z.ZodIssue[]): Record<string, string> {
-  const fieldErrors: Record<string, string> = {};
-  issues.forEach((issue) => {
-    const field = issue.path[0] as string;
-    if (!fieldErrors[field]) fieldErrors[field] = issue.message;
-  });
-  return fieldErrors;
-}
-
 export async function createServiceAction(
   _prev: ServiceActionState,
   formData: FormData
 ): Promise<ServiceActionState> {
   const { org, role } = await getCurrentOrg();
   if (role !== "owner") return { error: "Solo el dueño puede agregar servicios" };
+
+  const headersList = await headers();
+  const ip = getRateLimitKey(headersList, `service-create:${org.id}`);
+  const { allowed } = await rateLimit(`service-create:${ip}`, { maxRequests: 20, windowMs: 60_000 });
+  if (!allowed) return { error: "Demasiados intentos. Espera un minuto." };
+
   const parsed = parseFormData(formData);
 
   if (!parsed.success) {
@@ -77,6 +77,12 @@ export async function updateServiceAction(
 ): Promise<ServiceActionState> {
   const { org, role } = await getCurrentOrg();
   if (role !== "owner") return { error: "Solo el dueño puede editar servicios" };
+
+  const headersList = await headers();
+  const ip = getRateLimitKey(headersList, `service-update:${org.id}`);
+  const { allowed } = await rateLimit(`service-update:${ip}`, { maxRequests: 30, windowMs: 60_000 });
+  if (!allowed) return { error: "Demasiados intentos. Espera un minuto." };
+
   const id = formData.get("id");
   if (typeof id !== "string" || !id) {
     return { error: "Servicio inválido" };
@@ -111,9 +117,16 @@ export async function updateServiceAction(
   return { ok: true };
 }
 
-export async function toggleServiceAction(id: string, active: boolean) {
+export async function toggleServiceAction(id: string, active: boolean): Promise<ServiceActionState | void> {
   const { org, role } = await getCurrentOrg();
-  if (role !== "owner") throw new Error("Solo el dueño puede gestionar servicios");
+  if (role !== "owner") return { error: "Solo el dueño puede gestionar servicios" };
+
+  if (!z.string().uuid().safeParse(id).success) return;
+
+  const headersList = await headers();
+  const ip = getRateLimitKey(headersList, `service-toggle:${org.id}`);
+  const { allowed } = await rateLimit(`service-toggle:${ip}`, { maxRequests: 20, windowMs: 60_000 });
+  if (!allowed) return;
 
   await db
     .update(services)
@@ -121,15 +134,24 @@ export async function toggleServiceAction(id: string, active: boolean) {
     .where(and(eq(services.id, id), eq(services.organizationId, org.id)));
 
   revalidatePath("/servicios");
+  revalidatePath(`/b/${org.slug}`);
 }
 
-export async function deleteServiceAction(id: string) {
+export async function deleteServiceAction(id: string): Promise<ServiceActionState | void> {
   const { org, role } = await getCurrentOrg();
-  if (role !== "owner") throw new Error("Solo el dueño puede eliminar servicios");
+  if (role !== "owner") return { error: "Solo el dueño puede eliminar servicios" };
+
+  if (!z.string().uuid().safeParse(id).success) return;
+
+  const headersList = await headers();
+  const ip = getRateLimitKey(headersList, `service-delete:${org.id}`);
+  const { allowed } = await rateLimit(`service-delete:${ip}`, { maxRequests: 10, windowMs: 60_000 });
+  if (!allowed) return;
 
   await db
     .delete(services)
     .where(and(eq(services.id, id), eq(services.organizationId, org.id)));
 
   revalidatePath("/servicios");
+  revalidatePath(`/b/${org.slug}`);
 }

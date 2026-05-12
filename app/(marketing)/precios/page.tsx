@@ -11,7 +11,7 @@ const MAX_FOUNDERS = 20;
 export const metadata: Metadata = {
   title: "Precios — BarberLab",
   description:
-    "Tres planes pensados para cada etapa de tu barbería. 14 días gratis, sin tarjeta, sin comisiones por cita.",
+    "Tres planes pensados para cada etapa de tu barbería. 1 mes gratis, sin tarjeta, sin comisiones por cita.",
 };
 
 export default async function PreciosPage() {
@@ -32,7 +32,7 @@ export default async function PreciosPage() {
           <span className="italic">acomoda a tu barbería</span>.
         </h1>
         <p className="mx-auto mt-4 max-w-xl text-lg text-[color:var(--muted-foreground)]">
-          Todos los planes incluyen los 14 días gratis. Sin tarjeta al empezar.
+          Todos los planes incluyen 1 mes gratis. Sin tarjeta al empezar.
         </p>
       </section>
 

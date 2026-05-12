@@ -9,7 +9,7 @@ const FAQS = [
   },
   {
     q: "¿Pueden usarlo varios barberos a la vez?",
-    a: "Sí. El plan Pro incluye hasta 5 barberos con agenda separada. Cada uno entra desde su celular y ve solo sus citas.",
+    a: "Sí. Cada barbero tiene su propia agenda y ve solo sus citas. El plan Starter incluye 1 barbero, Pro hasta 3 y Premium hasta 5.",
   },
   {
     q: "¿Qué pasa si cambio de plan?",
@@ -21,7 +21,7 @@ const FAQS = [
   },
   {
     q: "¿Tienen soporte en español?",
-    a: "Por supuesto. Te atendemos por WhatsApp, email y en los planes Premium por llamada, en horario laboral CST.",
+    a: "Por supuesto. Te atendemos por WhatsApp y email en horario laboral CST.",
   },
 ];
 

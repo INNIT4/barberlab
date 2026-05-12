@@ -1,13 +1,16 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 import { and, eq } from "drizzle-orm";
-import type { z } from "zod";
+import { z } from "zod";
 import { db } from "@/lib/db";
 import { customers } from "@/lib/db/schema";
 import { getCurrentOrg } from "@/lib/auth/current-user";
 import { canUseCustomerTags } from "@/lib/features/can";
 import { customerSchema } from "@/lib/validation/customer";
+import { buildFieldErrors } from "@/lib/validation/helpers";
+import { rateLimit, getRateLimitKey } from "@/lib/rate-limit";
 
 export type CustomerActionState = {
   error?: string;
@@ -25,15 +28,6 @@ function parseFormData(formData: FormData) {
   });
 }
 
-function buildFieldErrors(issues: z.ZodIssue[]): Record<string, string> {
-  const fieldErrors: Record<string, string> = {};
-  issues.forEach((issue) => {
-    const field = issue.path[0] as string;
-    if (!fieldErrors[field]) fieldErrors[field] = issue.message;
-  });
-  return fieldErrors;
-}
-
 function isUniqueViolation(err: unknown): boolean {
   return (
     typeof err === "object" &&
@@ -48,6 +42,12 @@ export async function createCustomerAction(
   formData: FormData
 ): Promise<CustomerActionState> {
   const { org } = await getCurrentOrg();
+
+  const headersList = await headers();
+  const ip = getRateLimitKey(headersList, `customer-create:${org.id}`);
+  const { allowed } = await rateLimit(`customer-create:${ip}`, { maxRequests: 30, windowMs: 60_000 });
+  if (!allowed) return { error: "Demasiados clientes. Espera un minuto." };
+
   const parsed = parseFormData(formData);
 
   if (!parsed.success) {
@@ -87,6 +87,12 @@ export async function updateCustomerAction(
   formData: FormData
 ): Promise<CustomerActionState> {
   const { org } = await getCurrentOrg();
+
+  const headersList = await headers();
+  const ip = getRateLimitKey(headersList, `customer-update:${org.id}`);
+  const { allowed } = await rateLimit(`customer-update:${ip}`, { maxRequests: 30, windowMs: 60_000 });
+  if (!allowed) return { error: "Demasiados intentos. Espera un minuto." };
+
   const id = formData.get("id");
   if (typeof id !== "string" || !id) {
     return { error: "Cliente inválido" };
@@ -134,7 +140,15 @@ export async function updateCustomerAction(
 }
 
 export async function deleteCustomerAction(id: string) {
-  const { org } = await getCurrentOrg();
+  const { org, role } = await getCurrentOrg();
+  if (role !== "owner") return;
+
+  if (!z.string().uuid().safeParse(id).success) return;
+
+  const headersList = await headers();
+  const ip = getRateLimitKey(headersList, `customer-delete:${org.id}`);
+  const { allowed } = await rateLimit(`customer-delete:${ip}`, { maxRequests: 20, windowMs: 60_000 });
+  if (!allowed) return;
 
   await db
     .delete(customers)

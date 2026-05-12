@@ -1,8 +1,4 @@
-const fmt = new Intl.NumberFormat("es-MX", {
-  style: "currency",
-  currency: "MXN",
-  maximumFractionDigits: 0,
-});
+import { mxnCurrency } from "@/lib/formatters";
 
 export type DayRevenue = { day: string; revenue: number; isWeekend: boolean };
 
@@ -18,7 +14,7 @@ export function RevenueChart({ data }: { data: DayRevenue[] }) {
             Ingresos de la semana
           </p>
           <p className="mt-1 font-serif text-3xl font-semibold">
-            {fmt.format(total)}
+            {mxnCurrency.format(total)}
           </p>
         </div>
       </div>
@@ -47,7 +43,7 @@ export function RevenueChart({ data }: { data: DayRevenue[] }) {
                 />
                 {d.revenue > 0 && (
                   <div className="pointer-events-none absolute -top-9 left-1/2 z-10 -translate-x-1/2 rounded-md bg-[color:var(--foreground)] px-2 py-1 text-[10px] font-semibold text-[color:var(--background)] opacity-0 shadow-lg transition-opacity group-hover:opacity-100">
-                    {fmt.format(d.revenue)}
+                    {mxnCurrency.format(d.revenue)}
                   </div>
                 )}
               </div>

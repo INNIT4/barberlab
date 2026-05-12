@@ -195,15 +195,15 @@ export const appointments = pgTable(
     organizationId: uuid("organization_id")
       .notNull()
       .references(() => organizations.id, { onDelete: "cascade" }),
-    barberId: uuid("barber_id")
-      .notNull()
-      .references(() => barbers.id, { onDelete: "restrict" }),
-    serviceId: uuid("service_id")
-      .notNull()
-      .references(() => services.id, { onDelete: "restrict" }),
-    customerId: uuid("customer_id")
-      .notNull()
-      .references(() => customers.id, { onDelete: "restrict" }),
+    barberId: uuid("barber_id").references(() => barbers.id, {
+      onDelete: "set null",
+    }),
+    serviceId: uuid("service_id").references(() => services.id, {
+      onDelete: "set null",
+    }),
+    customerId: uuid("customer_id").references(() => customers.id, {
+      onDelete: "set null",
+    }),
     startsAt: timestamp("starts_at", { withTimezone: true }).notNull(),
     endsAt: timestamp("ends_at", { withTimezone: true }).notNull(),
     status: text("status", {
@@ -353,6 +353,20 @@ export const walkIns = pgTable(
       .defaultNow(),
   },
   (t) => [index("walk_ins_org_date_idx").on(t.organizationId, t.date)]
+);
+
+// ============================================================================
+// Relations (para drizzle query builder)
+// ============================================================================
+export const stripeWebhookEvents = pgTable(
+  "stripe_webhook_events",
+  {
+    id: text("id").primaryKey(),
+    type: text("type").notNull(),
+    processedAt: timestamp("processed_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  }
 );
 
 // ============================================================================

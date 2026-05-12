@@ -30,6 +30,7 @@ const nextConfig: NextConfig = {
               "style-src 'self' 'unsafe-inline'",
               "connect-src 'self' https://ycuxmuygdsokboujdgha.supabase.co https://api.stripe.com",
               "frame-src https://js.stripe.com",
+              "frame-ancestors 'none'",
               "form-action 'self'",
               "base-uri 'self'",
               "object-src 'none'",

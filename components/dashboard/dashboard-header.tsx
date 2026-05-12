@@ -1,10 +1,26 @@
+import { cache } from "react";
 import { desc, eq } from "drizzle-orm";
-import { Button } from "@/components/ui/button";
 import { db } from "@/lib/db";
 import { notifications } from "@/lib/db/schema";
 import { getCurrentOrg } from "@/lib/auth/current-user";
 import { UserMenu } from "./user-menu";
 import { NotificationsBell } from "./notifications-bell";
+import { MobileSidebar } from "./mobile-sidebar";
+
+const getNotifications = cache(async (orgId: string) => {
+  return db
+    .select({
+      id: notifications.id,
+      title: notifications.title,
+      body: notifications.body,
+      read: notifications.read,
+      createdAt: notifications.createdAt,
+    })
+    .from(notifications)
+    .where(eq(notifications.organizationId, orgId))
+    .orderBy(desc(notifications.createdAt))
+    .limit(20);
+});
 
 function initials(email: string) {
   const parts = email.split("@")[0].split(/[._-]/);
@@ -28,30 +44,22 @@ export async function DashboardHeader({
   const abbr = initials(email || org.name);
   const displayName = email.split("@")[0] || org.name;
 
-  const notifs = await db
-    .select({
-      id: notifications.id,
-      title: notifications.title,
-      body: notifications.body,
-      read: notifications.read,
-      createdAt: notifications.createdAt,
-    })
-    .from(notifications)
-    .where(eq(notifications.organizationId, org.id))
-    .orderBy(desc(notifications.createdAt))
-    .limit(20);
+  const notifs = await getNotifications(org.id);
 
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-[color:var(--border)] bg-[color:var(--background)]/90 px-6 backdrop-blur-md lg:px-8">
-      <div className="min-w-0">
-        <h1 className="truncate font-serif text-2xl font-semibold leading-tight tracking-tight">
-          {title}
-        </h1>
-        {subtitle && (
-          <p className="truncate text-xs text-[color:var(--muted-foreground)]">
-            {subtitle}
-          </p>
-        )}
+      <div className="flex items-center gap-3 min-w-0">
+        <MobileSidebar />
+        <div className="min-w-0">
+          <h1 className="truncate font-serif text-2xl font-semibold leading-tight tracking-tight">
+            {title}
+          </h1>
+          {subtitle && (
+            <p className="truncate text-xs text-[color:var(--muted-foreground)]">
+              {subtitle}
+            </p>
+          )}
+        </div>
       </div>
 
       <div className="flex items-center gap-2">

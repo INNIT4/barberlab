@@ -50,7 +50,7 @@ export function CheckoutButton({
               Empezar con plan {plan.charAt(0).toUpperCase() + plan.slice(1)}
             </DialogTitle>
             <DialogDescription>
-              14 días gratis · sin tarjeta al empezar. Completarás el pago en Stripe.
+              1 mes gratis · sin tarjeta al empezar. Completarás el pago en Stripe.
             </DialogDescription>
           </DialogHeader>
 

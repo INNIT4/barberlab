@@ -1,6 +1,6 @@
 ﻿import type { Metadata } from "next";
-import { and, asc, desc, eq, gte, lt, sql } from "drizzle-orm";
-import { formatInTimeZone, toZonedTime, fromZonedTime } from "date-fns-tz";
+import { and, desc, eq, gte, lt } from "drizzle-orm";
+import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { Button } from "@/components/ui/button";
@@ -10,18 +10,13 @@ import { expenses } from "@/lib/db/schema";
 import { getCurrentOrg } from "@/lib/auth/current-user";
 import { canUseExpenses } from "@/lib/features/can";
 import { UpgradeBanner } from "@/components/dashboard/upgrade-banner";
+import { mxnCurrency } from "@/lib/formatters";
 import { NewExpenseButton, EditExpenseButton } from "./expense-form";
 import { deleteExpenseAction } from "./actions";
 
 export const metadata: Metadata = {
   title: "Gastos — BarberLab",
 };
-
-const fmt = new Intl.NumberFormat("es-MX", {
-  style: "currency",
-  currency: "MXN",
-  maximumFractionDigits: 0,
-});
 
 const CATEGORY_LABEL: Record<string, string> = {
   Productos: "Productos",
@@ -129,23 +124,23 @@ export default async function GastosPage({
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <StatCard
               label="Gastos del mes"
-              value={fmt.format(totalMonth)}
+              value={mxnCurrency.format(totalMonth)}
               tone="negative"
               hint={`${list.length} movimientos`}
             />
             <StatCard
               label="Promedio diario"
-              value={fmt.format(avgDaily)}
+              value={mxnCurrency.format(avgDaily)}
               hint={`${daysInMonth} días`}
             />
             <StatCard
               label="Top categoría"
               value={topCategory ? CATEGORY_LABEL[topCategory[0]] ?? topCategory[0] : "—"}
-              hint={topCategory ? fmt.format(topCategory[1]) : "Sin gastos"}
+              hint={topCategory ? mxnCurrency.format(topCategory[1]) : "Sin gastos"}
             />
             <StatCard
               label="Mayor gasto"
-              value={list.length > 0 ? fmt.format(Math.max(...list.map((e) => e.amountMxn))) : "—"}
+              value={list.length > 0 ? mxnCurrency.format(Math.max(...list.map((e) => e.amountMxn))) : "—"}
               hint={list.length > 0 ? list.reduce((a, b) => (a.amountMxn > b.amountMxn ? a : b)).description : "Sin gastos"}
             />
           </div>
@@ -181,7 +176,7 @@ export default async function GastosPage({
                         />
                       </div>
                       <span className="w-20 text-right text-xs tabular-nums">
-                        {fmt.format(amount)} ({pct}%)
+                        {mxnCurrency.format(amount)} ({pct}%)
                       </span>
                     </div>
                   );
@@ -241,7 +236,7 @@ export default async function GastosPage({
                             </span>
                           </td>
                           <td className="px-5 py-3 text-right font-semibold">
-                            {fmt.format(e.amountMxn)}
+                            {mxnCurrency.format(e.amountMxn)}
                           </td>
                           <td className="px-5 py-3">
                             <div className="flex items-center gap-1">

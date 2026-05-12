@@ -1,13 +1,15 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 import { and, eq, ne } from "drizzle-orm";
-import type { z } from "zod";
 import { db } from "@/lib/db";
 import { organizations } from "@/lib/db/schema";
 import { getCurrentOrg } from "@/lib/auth/current-user";
 import { canUseBranding } from "@/lib/features/can";
 import { brandingSchema, organizationSchema } from "@/lib/validation/organization";
+import { buildFieldErrors } from "@/lib/validation/helpers";
+import { rateLimit, getRateLimitKey } from "@/lib/rate-limit";
 
 export type OrgActionState = {
   error?: string;
@@ -15,21 +17,17 @@ export type OrgActionState = {
   ok?: boolean;
 };
 
-function buildFieldErrors(issues: z.ZodIssue[]): Record<string, string> {
-  const fieldErrors: Record<string, string> = {};
-  issues.forEach((issue) => {
-    const field = issue.path[0] as string;
-    if (!fieldErrors[field]) fieldErrors[field] = issue.message;
-  });
-  return fieldErrors;
-}
-
 export async function updateOrganizationAction(
   _prev: OrgActionState,
   formData: FormData
 ): Promise<OrgActionState> {
   const { org, role } = await getCurrentOrg();
   if (role !== "owner") return { error: "Solo el dueño puede modificar la información del negocio" };
+
+  const headersList = await headers();
+  const ip = getRateLimitKey(headersList, `org-update:${org.id}`);
+  const { allowed } = await rateLimit(`org-update:${ip}`, { maxRequests: 10, windowMs: 60_000 });
+  if (!allowed) return { error: "Demasiados intentos. Espera un minuto." };
 
   const parsed = organizationSchema.safeParse({
     name: formData.get("name"),
@@ -77,6 +75,8 @@ export async function updateOrganizationAction(
 
   revalidatePath("/ajustes");
   revalidatePath("/agenda");
+  revalidatePath(`/b/${data.slug}`);
+  if (data.slug !== org.slug) revalidatePath(`/b/${org.slug}`);
   return { ok: true };
 }
 
@@ -86,6 +86,11 @@ export async function updateBrandingAction(
 ): Promise<OrgActionState> {
   const { org, role } = await getCurrentOrg();
   if (role !== "owner") return { error: "Solo el dueño puede modificar la apariencia" };
+
+  const headersList = await headers();
+  const ip = getRateLimitKey(headersList, `branding-update:${org.id}`);
+  const { allowed } = await rateLimit(`branding-update:${ip}`, { maxRequests: 10, windowMs: 60_000 });
+  if (!allowed) return { error: "Demasiados intentos. Espera un minuto." };
 
   if (!canUseBranding(org.plan)) {
     return { error: "Necesitas el plan Pro para personalizar tu página." };
@@ -133,5 +138,6 @@ export async function updateBrandingAction(
     .where(eq(organizations.id, org.id));
 
   revalidatePath("/ajustes");
+  revalidatePath(`/b/${org.slug}`);
   return { ok: true };
 }

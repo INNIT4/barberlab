@@ -1,9 +1,10 @@
 import { headers } from "next/headers";
 import { eq } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
 import { stripe } from "@/lib/stripe/client";
 import { getPlanFromPriceId } from "@/lib/stripe/prices";
 import { db } from "@/lib/db";
-import { memberships, organizations } from "@/lib/db/schema";
+import { memberships, organizations, stripeWebhookEvents, notifications } from "@/lib/db/schema";
 import { createClient } from "@supabase/supabase-js";
 import type Stripe from "stripe";
 
@@ -25,7 +26,7 @@ function slugify(text: string): string {
 }
 
 async function uniqueSlug(base: string): Promise<string> {
-  let slug = base || "barberia";
+  const slug = base || "barberia";
   let suffix = 0;
   while (true) {
     const candidate = suffix === 0 ? slug : `${slug}-${suffix}`;
@@ -61,12 +62,13 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   const subscriptionId = session.subscription as string;
   const subscription = await stripe.subscriptions.retrieve(subscriptionId);
   const priceId = subscription.items.data[0]?.price.id ?? "";
-  const periodEnd = stripeTimestampToDate((subscription as any).current_period_end);
+  const periodEnd = stripeTimestampToDate(
+    (subscription as unknown as Record<string, unknown>).current_period_end
+  );
 
   const supabase = adminClient();
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
-  // Buscar si ya existe una organización con ese email (evita listUsers)
   const existingOrg = await db.query.organizations.findFirst({
     where: eq(organizations.email, email),
     columns: { id: true },
@@ -96,24 +98,27 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   }
 
   const slug = await uniqueSlug(slugify(businessName));
-  const [org] = await db
-    .insert(organizations)
-    .values({
-      name: businessName,
-      slug,
-      plan,
-      stripeCustomerId,
-      stripeSubscriptionId: subscriptionId,
-      stripePriceId: priceId,
-      stripeStatus: subscription.status,
-      stripeCurrentPeriodEnd: periodEnd,
-    })
-    .returning({ id: organizations.id });
 
-  await db.insert(memberships).values({
-    userId,
-    organizationId: org.id,
-    role: "owner",
+  await db.transaction(async (tx) => {
+    const [org] = await tx
+      .insert(organizations)
+      .values({
+        name: businessName,
+        slug,
+        plan,
+        stripeCustomerId,
+        stripeSubscriptionId: subscriptionId,
+        stripePriceId: priceId,
+        stripeStatus: subscription.status,
+        stripeCurrentPeriodEnd: periodEnd,
+      })
+      .returning({ id: organizations.id });
+
+    await tx.insert(memberships).values({
+      userId,
+      organizationId: org.id,
+      role: "owner",
+    });
   });
 }
 
@@ -121,9 +126,11 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
   const stripeCustomerId = subscription.customer as string;
   const priceId = subscription.items.data[0]?.price.id ?? "";
   const plan = getPlanFromPriceId(priceId);
-  const periodEnd = stripeTimestampToDate((subscription as any).current_period_end);
+  const periodEnd = stripeTimestampToDate(
+    (subscription as unknown as Record<string, unknown>).current_period_end
+  );
 
-  await db
+  const result = await db
     .update(organizations)
     .set({
       plan,
@@ -132,12 +139,18 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
       stripeCurrentPeriodEnd: periodEnd,
       stripeSubscriptionId: subscription.id,
     })
-    .where(eq(organizations.stripeCustomerId, stripeCustomerId));
+    .where(eq(organizations.stripeCustomerId, stripeCustomerId))
+    .returning({ id: organizations.id });
+
+  if (result.length === 0) {
+    console.warn(`[stripe-webhook] No org found for customer ${stripeCustomerId}`);
+  }
 }
 
 async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
   const stripeCustomerId = subscription.customer as string;
-  await db
+
+  const result = await db
     .update(organizations)
     .set({
       plan: "starter",
@@ -146,7 +159,27 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
       stripePriceId: null,
       stripeCurrentPeriodEnd: null,
     })
-    .where(eq(organizations.stripeCustomerId, stripeCustomerId));
+    .where(eq(organizations.stripeCustomerId, stripeCustomerId))
+    .returning({ id: organizations.id });
+
+  if (result.length === 0) {
+    console.warn(`[stripe-webhook] No org found for customer ${stripeCustomerId}`);
+  }
+}
+
+async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
+  const stripeCustomerId = invoice.customer as string;
+  const org = await db.query.organizations.findFirst({
+    where: eq(organizations.stripeCustomerId, stripeCustomerId),
+    columns: { id: true },
+  });
+  if (!org) return;
+
+  await db.insert(notifications).values({
+    organizationId: org.id,
+    title: "Pago rechazado",
+    body: "El cobro de tu suscripción falló. Revisa tu método de pago en el portal de facturación.",
+  });
 }
 
 export async function POST(req: Request) {
@@ -167,6 +200,13 @@ export async function POST(req: Request) {
     return new Response("Invalid signature", { status: 400 });
   }
 
+  // Idempotencia: si ya procesamos este evento, ignoramos
+  try {
+    await db.insert(stripeWebhookEvents).values({ id: event.id, type: event.type });
+  } catch {
+    return new Response("ok");
+  }
+
   try {
     switch (event.type) {
       case "checkout.session.completed":
@@ -178,7 +218,14 @@ export async function POST(req: Request) {
       case "customer.subscription.deleted":
         await handleSubscriptionDeleted(event.data.object as Stripe.Subscription);
         break;
+      case "invoice.payment_failed":
+        await handleInvoicePaymentFailed(event.data.object as Stripe.Invoice);
+        break;
     }
+
+    revalidatePath("/ajustes");
+    revalidatePath("/agenda");
+    revalidatePath("/reportes");
   } catch (err) {
     console.error("[stripe-webhook]", err instanceof Error ? err.message : "Unknown error");
     return new Response("Webhook handler error", { status: 500 });

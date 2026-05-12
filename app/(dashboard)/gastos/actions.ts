@@ -1,19 +1,23 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 import { and, eq } from "drizzle-orm";
-import type { z } from "zod";
 import { db } from "@/lib/db";
 import { expenses } from "@/lib/db/schema";
 import { getCurrentOrg } from "@/lib/auth/current-user";
-import { z as z3 } from "zod";
+import { canUseExpenses } from "@/lib/features/can";
+import { z } from "zod";
+import { fromZonedTime } from "date-fns-tz";
+import { buildFieldErrors } from "@/lib/validation/helpers";
+import { rateLimit, getRateLimitKey } from "@/lib/rate-limit";
 
-const expenseSchema = z3.object({
-  description: z3.string().min(2, "Describe el gasto"),
-  amount: z3.coerce.number().int().min(1, "Monto inválido"),
-  category: z3.enum(["Productos", "Alquiler", "Servicios", "Salarios", "Marketing", "Otro"]),
-  date: z3.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Fecha inválida"),
-  notes: z3.string().optional(),
+const expenseSchema = z.object({
+  description: z.string().min(2, "Describe el gasto"),
+  amount: z.coerce.number().int().min(1, "Monto inválido"),
+  category: z.enum(["Productos", "Alquiler", "Servicios", "Salarios", "Marketing", "Otro"]),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Fecha inválida"),
+  notes: z.string().optional(),
 });
 
 export type ExpenseActionState = {
@@ -22,21 +26,18 @@ export type ExpenseActionState = {
   ok?: boolean;
 };
 
-function buildFieldErrors(issues: z3.ZodIssue[]): Record<string, string> {
-  const errors: Record<string, string> = {};
-  for (const issue of issues) {
-    const field = issue.path[0] as string;
-    if (!errors[field]) errors[field] = issue.message;
-  }
-  return errors;
-}
-
 export async function createExpenseAction(
   _prev: ExpenseActionState,
   formData: FormData
 ): Promise<ExpenseActionState> {
   const { org, role } = await getCurrentOrg();
   if (role !== "owner") return { error: "Solo el dueño puede registrar gastos" };
+  if (!canUseExpenses(org.plan)) return { error: "Necesitas el plan Pro para registrar gastos" };
+
+  const headersList = await headers();
+  const ip = getRateLimitKey(headersList, `expense-create:${org.id}`);
+  const { allowed } = await rateLimit(`expense-create:${ip}`, { maxRequests: 30, windowMs: 60_000 });
+  if (!allowed) return { error: "Demasiados intentos. Espera un minuto." };
 
   const parsed = expenseSchema.safeParse({
     description: formData.get("description"),
@@ -57,7 +58,7 @@ export async function createExpenseAction(
     description: data.description,
     amountMxn: data.amount,
     category: data.category,
-    date: new Date(`${data.date}T12:00:00-07:00`),
+    date: fromZonedTime(`${data.date} 12:00:00`, org.timezone),
     notes: data.notes?.trim() || null,
   });
 
@@ -72,6 +73,13 @@ export async function updateExpenseAction(
 ): Promise<ExpenseActionState> {
   const { org, role } = await getCurrentOrg();
   if (role !== "owner") return { error: "Solo el dueño puede modificar gastos" };
+  if (!canUseExpenses(org.plan)) return { error: "Necesitas el plan Pro para modificar gastos" };
+
+  const headersList = await headers();
+  const ip = getRateLimitKey(headersList, `expense-update:${org.id}`);
+  const { allowed } = await rateLimit(`expense-update:${ip}`, { maxRequests: 30, windowMs: 60_000 });
+  if (!allowed) return { error: "Demasiados intentos. Espera un minuto." };
+
   const id = formData.get("id") as string;
   if (!id) return { error: "Gasto no encontrado" };
 
@@ -95,7 +103,7 @@ export async function updateExpenseAction(
       description: data.description,
       amountMxn: data.amount,
       category: data.category,
-      date: new Date(`${data.date}T12:00:00-07:00`),
+      date: fromZonedTime(`${data.date} 12:00:00`, org.timezone),
       notes: data.notes?.trim() || null,
       updatedAt: new Date(),
     })
@@ -109,9 +117,18 @@ export async function updateExpenseAction(
   return { ok: true };
 }
 
-export async function deleteExpenseAction(id: string) {
+export async function deleteExpenseAction(id: string): Promise<ExpenseActionState | void> {
   const { org, role } = await getCurrentOrg();
-  if (role !== "owner") throw new Error("Solo el dueño puede eliminar gastos");
+  if (role !== "owner") return { error: "Solo el dueño puede eliminar gastos" };
+  if (!canUseExpenses(org.plan)) return { error: "Necesitas el plan Pro para eliminar gastos" };
+
+  if (!z.string().uuid().safeParse(id).success) return;
+
+  const headersList = await headers();
+  const ip = getRateLimitKey(headersList, `expense-delete:${org.id}`);
+  const { allowed } = await rateLimit(`expense-delete:${ip}`, { maxRequests: 20, windowMs: 60_000 });
+  if (!allowed) return;
+
   await db
     .delete(expenses)
     .where(and(eq(expenses.id, id), eq(expenses.organizationId, org.id)));

@@ -9,7 +9,7 @@ export type Plan = {
   badge?: string;
   features: string[];
   limits: {
-    maxBarbers: number | "ilimitados";
+    maxBarbers: number;
   };
 };
 
@@ -23,42 +23,49 @@ export const PLANS: Plan[] = [
       "1 barbero",
       "Agenda online ilimitada",
       "Página pública de reservas",
-      "Recordatorios por email",
-      "Soporte por WhatsApp",
+      "Historial de clientes",
+      "Reportes avanzados",
+      "Personalización de tu página",
+      "Exportación de datos (PDF)",
+      "Soporte",
     ],
     limits: { maxBarbers: 1 },
   },
   {
     id: "pro",
     name: "Pro",
-    tagline: "Para barberías con equipo.",
+    tagline: "Para barberías con equipo pequeño.",
     priceMxn: 649,
     highlighted: true,
     badge: "Más popular",
     features: [
-      "Hasta 5 barberos",
-      "Todo lo del plan Starter",
+      "Hasta 3 barberos",
+      "Agenda online ilimitada",
+      "Página pública de reservas",
       "Historial de clientes",
-      "Reportes de ingresos y asistencia",
+      "Reportes avanzados",
       "Personalización de tu página",
-      "Soporte prioritario",
+      "Exportación de datos (PDF)",
+      "Soporte",
     ],
-    limits: { maxBarbers: 5 },
+    limits: { maxBarbers: 3 },
   },
   {
     id: "premium",
     name: "Premium",
-    tagline: "Para barberías en crecimiento.",
+    tagline: "Para barberías consolidadas.",
     priceMxn: 999,
     features: [
-      "Barberos ilimitados",
-      "Todo lo del plan Pro",
-      "Reportes avanzados por barbero",
-      "Segmentación de clientes",
-      "Onboarding 1:1 con tu equipo",
-      "Soporte por llamada",
+      "Hasta 5 barberos",
+      "Agenda online ilimitada",
+      "Página pública de reservas",
+      "Historial de clientes",
+      "Reportes avanzados",
+      "Personalización de tu página",
+      "Exportación de datos (PDF)",
+      "Soporte",
     ],
-    limits: { maxBarbers: "ilimitados" },
+    limits: { maxBarbers: 5 },
   },
 ];
 

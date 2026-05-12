@@ -58,7 +58,8 @@ export function InviteStaffSection({
   }
 
   function copyLink(token: string) {
-    const link = `${window.location.origin}/signup?invite=${token}`;
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? window.location.origin;
+    const link = `${baseUrl}/signup?invite=${token}`;
     navigator.clipboard.writeText(link).then(() => {
       setCopied(token);
       toast.success("Enlace copiado");

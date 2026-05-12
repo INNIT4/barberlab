@@ -5,19 +5,14 @@ import { PLAN_BY_ID, PLANS, type PlanId } from "@/lib/data/plans";
 import { Check, Sparkles } from "lucide-react";
 import { db } from "@/lib/db";
 import { invitations } from "@/lib/db/schema";
+import { mxnCurrency } from "@/lib/formatters";
 import { SignupForm } from "./signup-form";
 
 export const metadata: Metadata = {
   title: "Crear cuenta — BarberLab",
   description:
-    "Prueba BarberLab 14 días gratis. Sin tarjeta al empezar, cancela cuando quieras.",
+    "Prueba BarberLab 1 mes gratis. Sin tarjeta al empezar, cancela cuando quieras.",
 };
-
-const fmt = new Intl.NumberFormat("es-MX", {
-  style: "currency",
-  currency: "MXN",
-  maximumFractionDigits: 0,
-});
 
 function isPlanId(value: string | undefined): value is PlanId {
   return value === "starter" || value === "pro" || value === "premium";
@@ -52,7 +47,7 @@ export default async function SignupPage({
       <div className="mb-8 text-center">
         <span className="inline-flex items-center gap-1.5 rounded-full border border-[color:var(--border)] bg-[color:var(--card)] px-3 py-1 text-xs font-medium">
           <Sparkles className="h-3 w-3 text-[oklch(0.55_0.18_70)]" />
-          14 días gratis · sin tarjeta
+          1 mes gratis · sin tarjeta
         </span>
         <h1 className="mt-4 font-serif text-3xl font-semibold tracking-tight">
           Crea tu BarberLab.
@@ -72,7 +67,7 @@ export default async function SignupPage({
               <p className="mt-1 font-serif text-lg font-semibold">
                 {plan.name}
                 <span className="ml-2 text-sm font-normal text-[color:var(--muted-foreground)]">
-                  {fmt.format(plan.priceMxn)} MXN/mes
+                  {mxnCurrency.format(plan.priceMxn)} MXN/mes
                 </span>
               </p>
             </div>
@@ -83,7 +78,7 @@ export default async function SignupPage({
           </p>
         </div>
 
-        <SignupForm inviteToken={inviteToken} inviteOrgName={inviteOrgName} />
+        <SignupForm inviteToken={inviteToken} inviteOrgName={inviteOrgName} planId={planId} />
 
         <ul className="mt-6 grid gap-2 text-xs text-[color:var(--muted-foreground)] sm:grid-cols-3">
           <li className="flex items-center gap-1.5">

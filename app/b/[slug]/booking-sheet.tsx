@@ -44,11 +44,7 @@ export type SheetBarber = {
   workingHoursAvailable: boolean;
 };
 
-const fmt = new Intl.NumberFormat("es-MX", {
-  style: "currency",
-  currency: "MXN",
-  maximumFractionDigits: 0,
-});
+import { mxnCurrency } from "@/lib/formatters";
 
 const initialState: BookingState = {};
 const DAYS_TO_SHOW = 14;
@@ -193,7 +189,7 @@ export function BookingSheet({
                 className="font-serif text-lg font-semibold"
                 style={{ color: accent }}
               >
-                {fmt.format(service.priceMxn)}
+                {mxnCurrency.format(service.priceMxn)}
               </span>
             </SheetDescription>
           </div>

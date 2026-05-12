@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { and, eq } from "drizzle-orm";
 import { fromZonedTime } from "date-fns-tz";
@@ -8,7 +9,6 @@ import { db } from "@/lib/db";
 import {
   appointments,
   barbers,
-  barberServices,
   customers,
   organizations,
   services,
@@ -18,6 +18,7 @@ import {
   type WorkingHours,
 } from "@/lib/data/working-hours";
 import { rateLimit, getRateLimitKey } from "@/lib/rate-limit";
+import { notifications } from "@/lib/db/schema";
 
 const bookingSchema = z.object({
   slug: z.string(),
@@ -130,40 +131,47 @@ export async function createPublicBookingAction(
     }
   }
 
-  // Buscar o crear cliente
-  let customerId: string;
-  const existingCustomer = await db.query.customers.findFirst({
-    where: and(
-      eq(customers.organizationId, org.id),
-      eq(customers.phone, data.customerPhone.trim())
-    ),
-  });
-
-  if (existingCustomer) {
-    customerId = existingCustomer.id;
-  } else {
-    const [created] = await db
-      .insert(customers)
-      .values({
-        organizationId: org.id,
-        name: data.customerName.trim(),
-        phone: data.customerPhone.trim(),
-        tag: "Nuevo",
-      })
-      .returning({ id: customers.id });
-    customerId = created.id;
-  }
-
   try {
-    await db.insert(appointments).values({
-      organizationId: org.id,
-      barberId: data.barberId,
-      serviceId: data.serviceId,
-      customerId,
-      startsAt,
-      endsAt,
-      status: "confirmada",
-      priceMxn: service.priceMxn,
+    await db.transaction(async (tx) => {
+      const existingCustomer = await tx.query.customers.findFirst({
+        where: and(
+          eq(customers.organizationId, org.id),
+          eq(customers.phone, data.customerPhone.trim())
+        ),
+      });
+
+      let cid: string;
+      if (existingCustomer) {
+        cid = existingCustomer.id;
+      } else {
+        const [created] = await tx
+          .insert(customers)
+          .values({
+            organizationId: org.id,
+            name: data.customerName.trim(),
+            phone: data.customerPhone.trim(),
+            tag: "Nuevo",
+          })
+          .returning({ id: customers.id });
+        cid = created.id;
+      }
+
+      await tx.insert(appointments).values({
+        organizationId: org.id,
+        barberId: data.barberId,
+        serviceId: data.serviceId,
+        customerId: cid,
+        startsAt,
+        endsAt,
+        status: "confirmada",
+        priceMxn: service.priceMxn,
+      });
+
+      await tx.insert(notifications).values({
+        organizationId: org.id,
+        title: "Nueva cita agendada",
+        body: `${data.customerName} — ${service.name} con ${barber.name} el ${data.date} a las ${data.time}`,
+      });
     });
   } catch (err) {
     if (isExclusionViolation(err)) {
@@ -172,5 +180,7 @@ export async function createPublicBookingAction(
     throw err;
   }
 
+  revalidatePath("/agenda");
+  revalidatePath(`/b/${data.slug}`);
   return { ok: true };
 }

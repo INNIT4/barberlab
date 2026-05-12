@@ -3,13 +3,8 @@
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import { Clock, Scissors } from "lucide-react";
+import { mxnCurrency } from "@/lib/formatters";
 import { BookingSheet, type SheetService, type SheetBarber } from "./booking-sheet";
-
-const fmt = new Intl.NumberFormat("es-MX", {
-  style: "currency",
-  currency: "MXN",
-  maximumFractionDigits: 0,
-});
 
 const CATEGORY_ORDER = ["Corte", "Barba", "Combo", "Extras"] as const;
 
@@ -191,7 +186,7 @@ function ServiceCard({
             className="font-serif text-lg font-semibold"
             style={{ color: accent }}
           >
-            {fmt.format(service.priceMxn)}
+            {mxnCurrency.format(service.priceMxn)}
           </span>
         </div>
       </div>

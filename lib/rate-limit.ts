@@ -1,3 +1,5 @@
+import { redisRateLimit } from "@/lib/rate-limit/redis";
+
 type RateLimitEntry = { count: number; resetAt: number };
 
 const store = new Map<string, RateLimitEntry>();
@@ -14,14 +16,10 @@ function cleanup() {
   }
 }
 
-/**
- * In-memory sliding window rate limiter.
- * Falls back gracefully if Redis/Upstash is not configured.
- */
-export async function rateLimit(
+function inMemoryRateLimit(
   key: string,
   { maxRequests, windowMs }: { maxRequests: number; windowMs: number }
-): Promise<{ allowed: boolean; remaining: number }> {
+): { allowed: boolean; remaining: number } {
   cleanup();
   const now = Date.now();
   const entry = store.get(key);
@@ -37,6 +35,20 @@ export async function rateLimit(
 
   entry.count++;
   return { allowed: true, remaining: maxRequests - entry.count };
+}
+
+/**
+ * Sliding window rate limiter.
+ * Tries Redis/Upstash first, falls back to in-memory Map.
+ */
+export async function rateLimit(
+  key: string,
+  { maxRequests, windowMs }: { maxRequests: number; windowMs: number }
+): Promise<{ allowed: boolean; remaining: number }> {
+  const redisResult = await redisRateLimit(key, { maxRequests, windowMs });
+  if (redisResult) return redisResult;
+
+  return inMemoryRateLimit(key, { maxRequests, windowMs });
 }
 
 /**

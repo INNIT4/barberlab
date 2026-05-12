@@ -1,0 +1,18 @@
+# BarberLab — Sistema de citas para barberías mexicanas
+
+BarberLab es un SaaS que ofrece agenda online, gestión de clientes, control de gastos y una página pública de reservas para barberías en México. Opera en pesos mexicanos (MXN) con precios locales.
+
+## Páginas principales
+- [Inicio](https://barberlab.app/): Landing page con features, precios y FAQ.
+- [Precios](https://barberlab.app/precios): Planes y suscripción vía Stripe.
+- [Blog](https://barberlab.app/blog): Artículos sobre barbería y negocio.
+- [Contacto](https://barberlab.app/contacto): Formulario de contacto.
+- [Sobre nosotros](https://barberlab.app/sobre-nosotros): Historia y misión.
+- [Privacidad](https://barberlab.app/privacidad): Política de privacidad.
+- [Términos](https://barberlab.app/terminos): Términos de servicio.
+- [Registro](https://barberlab.app/signup): Crear cuenta nueva.
+- [Login](https://barberlab.app/login): Iniciar sesión.
+
+## API y documentación
+- [Documentación de la API](): Próximamente.
+- [Integraciones](): Próximamente.

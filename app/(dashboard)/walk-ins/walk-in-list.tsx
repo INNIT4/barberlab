@@ -5,12 +5,7 @@ import { Button } from "@/components/ui/button";
 import { deleteWalkInAction } from "./actions";
 import { toast } from "sonner";
 import { formatInTimeZone } from "date-fns-tz";
-
-const fmt = new Intl.NumberFormat("es-MX", {
-  style: "currency",
-  currency: "MXN",
-  maximumFractionDigits: 0,
-});
+import { mxnCurrency } from "@/lib/formatters";
 
 export type WalkInRow = {
   id: string;
@@ -46,7 +41,7 @@ export function WalkInList({
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
               <span className="font-semibold tabular-nums">
-                {fmt.format(w.priceMxn)}
+                {mxnCurrency.format(w.priceMxn)}
               </span>
               {w.serviceName && (
                 <span className="text-xs text-[color:var(--muted-foreground)]">

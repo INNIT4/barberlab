@@ -26,14 +26,10 @@ import {
   type AppointmentActionState,
 } from "./actions";
 
+import { mxnCurrency } from "@/lib/formatters";
+
 const initialState: AppointmentActionState = {};
 const NEW_CUSTOMER = "__new__";
-
-const fmt = new Intl.NumberFormat("es-MX", {
-  style: "currency",
-  currency: "MXN",
-  maximumFractionDigits: 0,
-});
 
 export type BarberOption = { id: string; name: string };
 export type ServiceOption = {
@@ -215,7 +211,7 @@ function NewAppointmentDialog({
                   {availableServices.map((s) => (
                     <SelectItem key={s.id} value={s.id}>
                       {s.name} · {s.durationMinutes}min ·{" "}
-                      {fmt.format(s.priceMxn)}
+                      {mxnCurrency.format(s.priceMxn)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -340,7 +336,7 @@ function NewAppointmentDialog({
           {service ? (
             <p className="rounded-md bg-[oklch(0.97_0.01_80)] px-3 py-2 text-xs text-[color:var(--muted-foreground)]">
               Duración: {service.durationMinutes} min · Precio:{" "}
-              {fmt.format(service.priceMxn)}
+              {mxnCurrency.format(service.priceMxn)}
             </p>
           ) : null}
 

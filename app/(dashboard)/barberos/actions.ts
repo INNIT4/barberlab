@@ -1,14 +1,17 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { and, count, eq, inArray } from "drizzle-orm";
-import type { z } from "zod";
+import { headers } from "next/headers";
+import { and, count, desc, eq } from "drizzle-orm";
+import { z } from "zod";
 import { db } from "@/lib/db";
 import { barbers, barberServices } from "@/lib/db/schema";
 import { getCurrentOrg } from "@/lib/auth/current-user";
 import { canAddBarber } from "@/lib/features/can";
 import { barberSchema } from "@/lib/validation/barber";
+import { buildFieldErrors } from "@/lib/validation/helpers";
 import { DEFAULT_WORKING_HOURS } from "@/lib/data/working-hours";
+import { rateLimit, getRateLimitKey } from "@/lib/rate-limit";
 
 export type BarberActionState = {
   error?: string;
@@ -45,18 +48,7 @@ function parseFormData(formData: FormData) {
   });
 }
 
-function buildFieldErrors(issues: z.ZodIssue[]): Record<string, string> {
-  const fieldErrors: Record<string, string> = {};
-  issues.forEach((issue) => {
-    const field = issue.path[0] as string;
-    if (!fieldErrors[field]) fieldErrors[field] = issue.message;
-  });
-  return fieldErrors;
-}
-
 async function syncBarberServices(barberId: string, serviceIds: string[]) {
-  if (serviceIds.length === 0) return;
-
   await db.transaction(async (tx) => {
     await tx
       .delete(barberServices)
@@ -76,6 +68,11 @@ export async function createBarberAction(
 ): Promise<BarberActionState> {
   const { org, role } = await getCurrentOrg();
   if (role !== "owner") return { error: "Solo el dueño puede agregar barberos" };
+
+  const headersList = await headers();
+  const ip = getRateLimitKey(headersList, `barber-create:${org.id}`);
+  const { allowed } = await rateLimit(`barber-create:${ip}`, { maxRequests: 10, windowMs: 60_000 });
+  if (!allowed) return { error: "Demasiados intentos. Espera un minuto." };
 
   const [{ current }] = await db
     .select({ current: count() })
@@ -99,19 +96,31 @@ export async function createBarberAction(
 
   const serviceIds = parseServiceIds(formData.get("serviceIds"));
 
-  const [barber] = await db
-    .insert(barbers)
-    .values({
+  await db.transaction(async (tx) => {
+    await tx.insert(barbers).values({
       organizationId: org.id,
       name: parsed.data.name,
       role: parsed.data.role,
       phone: parsed.data.phone ?? null,
       avatarTone: parsed.data.avatarTone,
       workingHours: parsed.data.workingHours,
-    })
-    .returning({ id: barbers.id });
+    });
 
-  await syncBarberServices(barber.id, serviceIds);
+    if (serviceIds.length > 0) {
+      const all = await tx
+        .select({ id: barbers.id })
+        .from(barbers)
+        .where(eq(barbers.organizationId, org.id))
+        .orderBy(desc(barbers.createdAt))
+        .limit(1);
+      const barberId = all[0]?.id;
+      if (barberId) {
+        await tx.insert(barberServices).values(
+          serviceIds.map((sid) => ({ barberId, serviceId: sid }))
+        );
+      }
+    }
+  });
 
   revalidatePath("/barberos");
   return { ok: true };
@@ -123,6 +132,12 @@ export async function updateBarberAction(
 ): Promise<BarberActionState> {
   const { org, role } = await getCurrentOrg();
   if (role !== "owner") return { error: "Solo el dueño puede editar barberos" };
+
+  const headersList = await headers();
+  const ip = getRateLimitKey(headersList, `barber-update:${org.id}`);
+  const { allowed } = await rateLimit(`barber-update:${ip}`, { maxRequests: 30, windowMs: 60_000 });
+  if (!allowed) return { error: "Demasiados intentos. Espera un minuto." };
+
   const id = formData.get("id");
   if (typeof id !== "string" || !id) {
     return { error: "Barbero inválido" };
@@ -161,9 +176,16 @@ export async function updateBarberAction(
   return { ok: true };
 }
 
-export async function toggleBarberAction(id: string, active: boolean) {
+export async function toggleBarberAction(id: string, active: boolean): Promise<BarberActionState | void> {
   const { org, role } = await getCurrentOrg();
-  if (role !== "owner") throw new Error("Solo el dueño puede gestionar barberos");
+  if (role !== "owner") return { error: "Solo el dueño puede gestionar barberos" };
+
+  if (!z.string().uuid().safeParse(id).success) return;
+
+  const headersList = await headers();
+  const ip = getRateLimitKey(headersList, `barber-toggle:${org.id}`);
+  const { allowed } = await rateLimit(`barber-toggle:${ip}`, { maxRequests: 20, windowMs: 60_000 });
+  if (!allowed) return;
 
   await db
     .update(barbers)
@@ -171,15 +193,24 @@ export async function toggleBarberAction(id: string, active: boolean) {
     .where(and(eq(barbers.id, id), eq(barbers.organizationId, org.id)));
 
   revalidatePath("/barberos");
+  revalidatePath(`/b/${org.slug}`);
 }
 
-export async function deleteBarberAction(id: string) {
+export async function deleteBarberAction(id: string): Promise<BarberActionState | void> {
   const { org, role } = await getCurrentOrg();
-  if (role !== "owner") throw new Error("Solo el dueño puede eliminar barberos");
+  if (role !== "owner") return { error: "Solo el dueño puede eliminar barberos" };
+
+  if (!z.string().uuid().safeParse(id).success) return;
+
+  const headersList = await headers();
+  const ip = getRateLimitKey(headersList, `barber-delete:${org.id}`);
+  const { allowed } = await rateLimit(`barber-delete:${ip}`, { maxRequests: 10, windowMs: 60_000 });
+  if (!allowed) return;
 
   await db
     .delete(barbers)
     .where(and(eq(barbers.id, id), eq(barbers.organizationId, org.id)));
 
   revalidatePath("/barberos");
+  revalidatePath(`/b/${org.slug}`);
 }

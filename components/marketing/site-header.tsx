@@ -1,5 +1,10 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
+import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Logo } from "./logo";
 
 const NAV_LINKS = [
@@ -9,9 +14,10 @@ const NAV_LINKS = [
 ];
 
 export function SiteHeader() {
+  const [open, setOpen] = useState(false);
+
   return (
     <header className="sticky top-0 z-40 w-full bg-[color:var(--background)]/92 backdrop-blur-md">
-      {/* Top hairline tape — date + edition */}
       <div className="hidden border-b border-[color:var(--border)] md:block">
         <div className="mx-auto flex h-7 max-w-6xl items-center justify-between px-4 text-[10px] uppercase tracking-[0.22em] text-[color:var(--muted-foreground)] sm:px-6">
           <span>Edición fundadores · MMXXVI</span>
@@ -50,6 +56,36 @@ export function SiteHeader() {
             <Button asChild size="sm" className="stamp-tight bg-[color:var(--ink)] text-[color:var(--paper)] hover:bg-[color:var(--oxblood)]">
               <Link href="/signup">Probar 1 mes</Link>
             </Button>
+
+            <Sheet open={open} onOpenChange={setOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="md:hidden" aria-label="Abrir menú">
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-64 pt-12">
+                <nav className="flex flex-col gap-4">
+                  {NAV_LINKS.map((l) => (
+                    <Link
+                      key={l.href}
+                      href={l.href}
+                      onClick={() => setOpen(false)}
+                      className="font-serif text-lg text-[color:var(--foreground)] transition-colors hover:text-[color:var(--oxblood)]"
+                    >
+                      {l.label}
+                    </Link>
+                  ))}
+                  <hr className="border-[color:var(--border)]" />
+                  <Link
+                    href="/login"
+                    onClick={() => setOpen(false)}
+                    className="text-sm text-[color:var(--muted-foreground)] hover:text-[color:var(--foreground)]"
+                  >
+                    Iniciar sesión
+                  </Link>
+                </nav>
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
       </div>

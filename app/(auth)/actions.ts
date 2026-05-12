@@ -23,6 +23,7 @@ const signupSchema = z.object({
   email: z.string().email("Email inválido"),
   phone: z.string().min(8, "Teléfono demasiado corto"),
   password: z.string().min(8, "Mínimo 8 caracteres"),
+  plan: z.enum(["starter", "pro", "premium"]),
   slug: z
     .string()
     .min(3, "Mínimo 3 caracteres")
@@ -74,16 +75,14 @@ function slugify(input: string): string {
     .slice(0, 40);
 }
 
-function sanitizeError(msg: string): string {
-  // No incluir el error original para evitar leaks de PII en logs
-  return msg;
-}
-
 function getSiteUrl(): string {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? process.env.NEXT_PUBLIC_APP_URL;
-  if (siteUrl) return siteUrl;
-  if (process.env.NODE_ENV !== "production") return "http://localhost:3000";
-  throw new Error("NEXT_PUBLIC_SITE_URL must be set in production");
+  return (
+    process.env.NEXT_PUBLIC_SITE_URL ??
+    process.env.NEXT_PUBLIC_APP_URL ??
+    (process.env.NODE_ENV === "production"
+      ? "https://barberlab.app"
+      : "http://localhost:3000")
+  );
 }
 
 // ============================================================================
@@ -165,10 +164,10 @@ async function handleInviteSignup(inviteToken: string, formData: FormData): Prom
   });
 
   if (authError || !authData.user) {
-    if (authError?.message.includes("already registered")) {
+    if (authError?.message?.includes("already registered")) {
       return { error: "Ya existe una cuenta con ese email", fieldErrors: { email: "Ya existe una cuenta con ese email" } };
     }
-    return { error: authError?.message ?? "Error al crear la cuenta" };
+    return { error: "Error al crear la cuenta. Intenta de nuevo." };
   }
 
   const userId = authData.user.id;
@@ -186,7 +185,7 @@ async function handleInviteSignup(inviteToken: string, formData: FormData): Prom
         .where(eq(invitations.id, invitation.id));
     });
   } catch {
-    console.error(sanitizeError("Staff signup failed"));
+    console.error("Staff signup DB transaction failed");
     return { error: "Error uniéndote a la barbería. Intenta de nuevo." };
   }
 
@@ -222,6 +221,7 @@ export async function signupAction(
     email: formData.get("email"),
     phone: formData.get("phone"),
     password: formData.get("password"),
+    plan: formData.get("plan"),
     slug: normalizedSlug,
   });
 
@@ -256,20 +256,20 @@ export async function signupAction(
   });
 
   if (authError || !authData.user) {
-    if (authError?.message.includes("already registered")) {
+    if (authError?.message?.includes("already registered")) {
       return {
         error: "Ya existe una cuenta con ese email",
         fieldErrors: { email: "Ya existe una cuenta con ese email" },
       };
     }
-    return { error: authError?.message ?? "Error al crear la cuenta" };
+    return { error: "Error al crear la cuenta. Intenta de nuevo." };
   }
 
   const userId = authData.user.id;
 
   try {
     const trialEnds = new Date();
-    trialEnds.setDate(trialEnds.getDate() + 14);
+    trialEnds.setDate(trialEnds.getDate() + 30);
 
     await db.transaction(async (tx) => {
       const [org] = await tx
@@ -279,7 +279,7 @@ export async function signupAction(
           name: data.shop,
           phone: data.phone,
           email: data.email,
-          plan: "premium",
+          plan: data.plan,
           trialEndsAt: trialEnds,
         })
         .returning();
@@ -302,7 +302,7 @@ export async function signupAction(
       );
     });
   } catch {
-    console.error(sanitizeError("Signup org creation failed"));
+    console.error("Signup org creation DB transaction failed");
     return {
       error: "Error creando la barbería. Intenta de nuevo o contáctanos.",
     };
@@ -395,36 +395,4 @@ export async function updatePasswordAction(
   }
 
   redirect("/agenda");
-}
-
-// ============================================================================
-// Google OAuth
-// ============================================================================
-export async function signInWithGoogleAction() {
-  const headersList = await headers();
-  const ip = getRateLimitKey(headersList, "google");
-  const { allowed } = await rateLimit(`google:${ip}`, { maxRequests: 5, windowMs: 60_000 });
-  if (!allowed) {
-    redirect("/login?error=rate_limit");
-  }
-
-  const supabase = await createClient();
-  const siteUrl = getSiteUrl();
-
-  const { data } = await supabase.auth.signInWithOAuth({
-    provider: "google",
-    options: {
-      redirectTo: `${siteUrl}/auth/callback`,
-      queryParams: {
-        access_type: "offline",
-        prompt: "consent",
-      },
-    },
-  });
-
-  if (data.url) {
-    redirect(data.url);
-  }
-
-  redirect("/login?error=google");
 }

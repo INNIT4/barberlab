@@ -11,6 +11,9 @@ import { ServicesSection } from "./services-section";
 import { TeamSection } from "./team-section";
 import { LocationSection } from "./location-section";
 import { PublicFooter } from "./public-footer";
+import { JsonLd } from "./json-ld";
+
+export const revalidate = 60;
 
 const DEFAULT_ACCENT = "#7B1E2B";
 
@@ -105,6 +108,14 @@ export default async function PublicPage({
         logoUrl={org.logoUrl}
         whatsappUrl={whatsappUrl}
         accent={accent}
+      />
+
+      <JsonLd
+        name={org.name}
+        phone={org.phone}
+        address={org.address}
+        slug={org.slug}
+        services={sheetServices}
       />
 
       <main>

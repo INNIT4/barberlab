@@ -19,11 +19,7 @@ export const metadata: Metadata = {
   title: "Walk-ins — BarberLab",
 };
 
-const fmt = new Intl.NumberFormat("es-MX", {
-  style: "currency",
-  currency: "MXN",
-  maximumFractionDigits: 0,
-});
+import { mxnCurrency } from "@/lib/formatters";
 
 export default async function WalkInsPage() {
   const { org } = await getCurrentOrg();
@@ -127,20 +123,20 @@ export default async function WalkInsPage() {
           <div className="grid gap-4 sm:grid-cols-3">
             <StatCard
               label="Ventas del mes"
-              value={fmt.format(monthRevenue)}
+              value={mxnCurrency.format(monthRevenue)}
               tone="positive"
               hint={`${monthWalkIns.length} walk-ins`}
             />
             <StatCard
               label="Ventas hoy"
-              value={fmt.format(todayRevenue)}
+              value={mxnCurrency.format(todayRevenue)}
               hint="walk-ins del día"
             />
             <StatCard
               label="Ticket promedio"
               value={
                 monthWalkIns.length > 0
-                  ? fmt.format(Math.round(monthRevenue / monthWalkIns.length))
+                  ? mxnCurrency.format(Math.round(monthRevenue / monthWalkIns.length))
                   : "$0"
               }
               hint="por walk-in este mes"

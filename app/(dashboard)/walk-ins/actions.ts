@@ -1,12 +1,14 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 import { and, eq } from "drizzle-orm";
 import { fromZonedTime } from "date-fns-tz";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { walkIns, barbers, services } from "@/lib/db/schema";
 import { getCurrentOrg } from "@/lib/auth/current-user";
+import { rateLimit, getRateLimitKey } from "@/lib/rate-limit";
 
 const walkInSchema = z.object({
   priceMxn: z.coerce.number().int().positive("El monto debe ser mayor a 0"),
@@ -27,6 +29,11 @@ export async function createWalkInAction(
   formData: FormData
 ): Promise<WalkInActionState> {
   const { org } = await getCurrentOrg();
+
+  const headersList = await headers();
+  const ip = getRateLimitKey(headersList, `walkin-create:${org.id}`);
+  const { allowed } = await rateLimit(`walkin-create:${ip}`, { maxRequests: 30, windowMs: 60_000 });
+  if (!allowed) return { error: "Demasiados registros. Espera un minuto." };
 
   const parsed = walkInSchema.safeParse({
     priceMxn: formData.get("priceMxn"),
@@ -95,7 +102,15 @@ export async function createWalkInAction(
 }
 
 export async function deleteWalkInAction(id: string) {
-  const { org } = await getCurrentOrg();
+  const { org, role } = await getCurrentOrg();
+  if (role !== "owner") return;
+
+  if (!z.string().uuid().safeParse(id).success) return;
+
+  const headersList = await headers();
+  const ip = getRateLimitKey(headersList, `walkin-delete:${org.id}`);
+  const { allowed } = await rateLimit(`walkin-delete:${ip}`, { maxRequests: 20, windowMs: 60_000 });
+  if (!allowed) return;
 
   await db
     .delete(walkIns)

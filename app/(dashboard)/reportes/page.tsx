@@ -4,7 +4,6 @@ import { toZonedTime, fromZonedTime } from "date-fns-tz";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { RevenueChart, type DayRevenue } from "@/components/dashboard/revenue-chart";
-import { TrendingUp, TrendingDown } from "lucide-react";
 import { db } from "@/lib/db";
 import { appointments, barbers, services, expenses, walkIns } from "@/lib/db/schema";
 import { getCurrentOrg } from "@/lib/auth/current-user";
@@ -16,11 +15,7 @@ export const metadata: Metadata = {
   title: "Reportes — BarberLab",
 };
 
-const fmt = new Intl.NumberFormat("es-MX", {
-  style: "currency",
-  currency: "MXN",
-  maximumFractionDigits: 0,
-});
+import { mxnCurrency } from "@/lib/formatters";
 
 const DAY_LABELS = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
 const WEEKEND = new Set([0, 6]);
@@ -213,7 +208,7 @@ export default async function ReportesPage() {
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
             <StatCard
               label="Ingresos del mes"
-              value={fmt.format(totalRevenue)}
+              value={mxnCurrency.format(totalRevenue)}
               delta={
                 growth
                   ? {
@@ -227,13 +222,13 @@ export default async function ReportesPage() {
             />
             <StatCard
               label="Gastos del mes"
-              value={fmt.format(expenseTotal.total)}
+              value={mxnCurrency.format(expenseTotal.total)}
               tone="negative"
               hint="total egresos"
             />
             <StatCard
               label="Ganancia neta"
-              value={fmt.format(netProfit)}
+              value={mxnCurrency.format(netProfit)}
               tone={netProfit >= 0 ? "positive" : "negative"}
               hint="ingresos – gastos"
             />
@@ -244,7 +239,7 @@ export default async function ReportesPage() {
             />
             <StatCard
               label="Ticket promedio"
-              value={fmt.format(Math.round(avgTicket))}
+              value={mxnCurrency.format(Math.round(avgTicket))}
               hint="citas + walk-ins"
             />
             <StatCard
@@ -297,7 +292,7 @@ export default async function ReportesPage() {
                           <div>
                             <p className="font-medium">{b.name}</p>
                             <p className="text-xs text-[color:var(--muted-foreground)]">
-                              {b.bookings} citas · {fmt.format(b.revenue)}
+                              {b.bookings} citas · {mxnCurrency.format(b.revenue)}
                             </p>
                           </div>
                           <span className="font-serif text-lg font-semibold">
@@ -352,12 +347,12 @@ export default async function ReportesPage() {
                         <div>
                           <p className="font-medium">{s.name}</p>
                           <p className="text-xs text-[color:var(--muted-foreground)]">
-                            {s.bookings} citas · {fmt.format(s.unitPrice)} c/u
+                            {s.bookings} citas · {mxnCurrency.format(s.unitPrice)} c/u
                           </p>
                         </div>
                       </div>
                       <span className="font-serif text-base font-semibold">
-                        {fmt.format(s.revenue)}
+                        {mxnCurrency.format(s.revenue)}
                       </span>
                     </li>
                   ))}
