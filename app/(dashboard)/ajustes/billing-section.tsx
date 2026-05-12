@@ -1,10 +1,10 @@
 ﻿"use client";
 
 import { useTransition } from "react";
-import { CreditCard, Loader2, CheckCircle, AlertCircle } from "lucide-react";
+import { CreditCard, Loader2, CheckCircle, AlertCircle, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { createBillingPortalSessionAction } from "./billing-actions";
+import { createBillingPortalSessionAction, createSubscriptionCheckoutAction } from "./billing-actions";
 import type { PlanId } from "@/lib/data/plans";
 import { PLAN_BY_ID } from "@/lib/data/plans";
 
@@ -33,6 +33,17 @@ export function BillingSection({
   function openPortal() {
     startTransition(async () => {
       const result = await createBillingPortalSessionAction();
+      if (result.url) {
+        window.location.href = result.url;
+      } else if (result.error) {
+        toast.error(result.error);
+      }
+    });
+  }
+
+  function startSubscription() {
+    startTransition(async () => {
+      const result = await createSubscriptionCheckoutAction();
       if (result.url) {
         window.location.href = result.url;
       } else if (result.error) {
@@ -121,9 +132,23 @@ export function BillingSection({
             )}
           </Button>
         ) : (
-          <p className="text-sm text-muted-foreground">
-            Tu cuenta fue creada manualmente. Contacta soporte para gestionar tu plan.
-          </p>
+          <Button
+            onClick={startSubscription}
+            disabled={isPending}
+            className="w-full sm:w-auto"
+          >
+            {isPending ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Redirigiendo…
+              </>
+            ) : (
+              <>
+                Activar suscripción
+                <ArrowRight className="ml-1.5 h-4 w-4" />
+              </>
+            )}
+          </Button>
         )}
       </div>
     </div>

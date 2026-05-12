@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 
 
 export default async function AjustesPage() {
-  const { org } = await getCurrentOrg();
+  const { org } = await getCurrentOrg({ skipTrialRedirect: true });
 
   const [[{ barberCount }], [{ appointmentCount }]] = await Promise.all([
     db

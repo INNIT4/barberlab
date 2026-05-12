@@ -1,8 +1,10 @@
 ﻿import type { Metadata } from "next";
-import { count } from "drizzle-orm";
+import { count, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { organizations } from "@/lib/db/schema";
+import { organizations, memberships } from "@/lib/db/schema";
+import { createClient } from "@/lib/supabase/server";
 import { PricingSection } from "@/components/marketing/pricing-section";
+import { TrialExpiredBanner } from "./trial-expired-banner";
 import { FaqSection } from "@/components/marketing/faq-section";
 import { CtaSection } from "@/components/marketing/cta-section";
 
@@ -21,6 +23,27 @@ export default async function PreciosPage() {
 
   const remaining = Math.max(0, MAX_FOUNDERS - total);
 
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  let trialExpired = false;
+  let expiredOrgPlan: string | null = null;
+
+  if (user) {
+    const membership = await db.query.memberships.findFirst({
+      where: eq(memberships.userId, user.id),
+      with: { organization: { columns: { plan: true, trialEndsAt: true, stripeSubscriptionId: true } } },
+    });
+    if (
+      membership?.organization.trialEndsAt &&
+      membership.organization.trialEndsAt < new Date() &&
+      !membership.organization.stripeSubscriptionId
+    ) {
+      trialExpired = true;
+      expiredOrgPlan = membership.organization.plan;
+    }
+  }
+
   return (
     <>
       <section className="mx-auto max-w-6xl px-4 pt-16 pb-8 text-center sm:px-6 sm:pt-24">
@@ -36,6 +59,7 @@ export default async function PreciosPage() {
         </p>
       </section>
 
+      {trialExpired && <TrialExpiredBanner plan={expiredOrgPlan ?? undefined} />}
       <PricingSection compact />
       <FaqSection />
       <CtaSection remaining={remaining} />

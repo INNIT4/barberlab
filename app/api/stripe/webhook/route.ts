@@ -47,24 +47,47 @@ function adminClient() {
 
 async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   const stripeCustomerId = session.customer as string;
+  const subscriptionId = session.subscription as string;
+  const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+  const priceId = subscription.items.data[0]?.price.id ?? "";
+  const plan = getPlanFromPriceId(session.metadata?.priceId ?? priceId);
+  const periodEnd = stripeTimestampToDate(
+    (subscription as unknown as Record<string, unknown>).current_period_end
+  );
+
+  // Case 1: Existing org triggered checkout from billing section
+  const orgIdFromMeta = session.metadata?.organizationId;
+  if (orgIdFromMeta) {
+    const org = await db.query.organizations.findFirst({
+      where: eq(organizations.id, orgIdFromMeta),
+      columns: { id: true },
+    });
+    if (org) {
+      await db.update(organizations).set({
+        plan,
+        stripeCustomerId,
+        stripeSubscriptionId: subscriptionId,
+        stripePriceId: priceId,
+        stripeStatus: subscription.status,
+        stripeCurrentPeriodEnd: periodEnd,
+        trialEndsAt: null,
+      }).where(eq(organizations.id, org.id));
+      return;
+    }
+  }
+
+  // Case 2: Org already has this Stripe customer
   const existing = await db.query.organizations.findFirst({
     where: eq(organizations.stripeCustomerId, stripeCustomerId),
     columns: { id: true },
   });
   if (existing) return;
 
+  // Case 3: New signup through Stripe checkout (legacy / precios flow)
   const email = session.customer_details?.email;
   if (!email) return;
 
   const businessName = (session.metadata?.businessName ?? email.split("@")[0]).trim();
-  const plan = getPlanFromPriceId(session.metadata?.priceId ?? "");
-
-  const subscriptionId = session.subscription as string;
-  const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-  const priceId = subscription.items.data[0]?.price.id ?? "";
-  const periodEnd = stripeTimestampToDate(
-    (subscription as unknown as Record<string, unknown>).current_period_end
-  );
 
   const supabase = adminClient();
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";

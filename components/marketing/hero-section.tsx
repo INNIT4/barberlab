@@ -76,7 +76,7 @@ export function HeroSection() {
                 size="lg"
                 className="h-12 bg-[color:var(--ink)] px-7 text-[0.85rem] uppercase tracking-[0.18em] text-[color:var(--paper)] shadow-[3px_3px_0_var(--oxblood)] transition-transform hover:-translate-y-0.5 hover:bg-[color:var(--oxblood)] hover:shadow-[5px_5px_0_var(--ink)]"
               >
-                <Link href="/precios">
+                <Link href="/signup">
                   Probar 1 mes gratis
                   <ArrowRight className="ml-1 h-4 w-4" />
                 </Link>
