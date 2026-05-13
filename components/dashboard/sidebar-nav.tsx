@@ -20,17 +20,20 @@ const NAV = [
   { href: "/barberos", label: "Barberos", icon: UserCheck },
   { href: "/servicios", label: "Servicios", icon: Scissors },
   { href: "/clientes", label: "Clientes", icon: Users },
-  { href: "/gastos", label: "Gastos", icon: Receipt },
-  { href: "/reportes", label: "Reportes", icon: BarChart3 },
-  { href: "/ajustes", label: "Ajustes", icon: Settings },
+  { href: "/gastos", label: "Gastos", icon: Receipt, ownerOnly: true },
+  { href: "/reportes", label: "Reportes", icon: BarChart3, ownerOnly: true },
+  { href: "/ajustes", label: "Ajustes", icon: Settings, ownerOnly: true },
 ];
 
-export function SidebarNav() {
+export function SidebarNav({ role }: { role?: string }) {
   const pathname = usePathname();
+  const isOwner = role === "owner";
+
+  const items = isOwner ? NAV : NAV.filter((item) => !item.ownerOnly);
 
   return (
     <nav className="flex flex-col gap-0.5 px-3">
-      {NAV.map((item) => {
+      {items.map((item) => {
         const active =
           pathname === item.href || pathname.startsWith(`${item.href}/`);
         const Icon = item.icon;

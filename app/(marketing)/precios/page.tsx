@@ -27,18 +27,23 @@ export default async function PreciosPage() {
   const { data: { user } } = await supabase.auth.getUser();
 
   let trialExpired = false;
+  let isOwnerRole = false;
 
   if (user) {
     const membership = await db.query.memberships.findFirst({
       where: eq(memberships.userId, user.id),
       with: { organization: { columns: { trialEndsAt: true, stripeSubscriptionId: true } } },
+      columns: { role: true },
     });
-    if (
-      membership?.organization.trialEndsAt &&
-      membership.organization.trialEndsAt < new Date() &&
-      !membership.organization.stripeSubscriptionId
-    ) {
-      trialExpired = true;
+    if (membership) {
+      isOwnerRole = membership.role === "owner";
+      if (
+        membership.organization.trialEndsAt &&
+        membership.organization.trialEndsAt < new Date() &&
+        !membership.organization.stripeSubscriptionId
+      ) {
+        trialExpired = true;
+      }
     }
   }
 
@@ -57,8 +62,8 @@ export default async function PreciosPage() {
         </p>
       </section>
 
-      {trialExpired && <TrialExpiredBanner />}
-      <PricingSection compact trialExpired={trialExpired} />
+      {trialExpired && <TrialExpiredBanner isOwner={isOwnerRole} />}
+      <PricingSection compact trialExpired={trialExpired && isOwnerRole} />
       <FaqSection />
       <CtaSection remaining={remaining} />
     </>

@@ -8,7 +8,7 @@ import { PLAN_BY_ID } from "@/lib/data/plans";
 import { ThemeToggle } from "./theme-toggle";
 
 export async function Sidebar() {
-  const { org } = await getCurrentOrg();
+  const { org, role } = await getCurrentOrg();
   const plan = PLAN_BY_ID[org.plan];
 
   return (
@@ -34,7 +34,7 @@ export async function Sidebar() {
         </div>
       </div>
 
-      <SidebarNav />
+      <SidebarNav role={role} />
 
       <div className="mt-auto space-y-3 p-4">
         <Link

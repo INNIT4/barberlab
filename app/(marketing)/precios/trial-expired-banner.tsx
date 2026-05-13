@@ -2,7 +2,7 @@
 
 import { AlertTriangle } from "lucide-react";
 
-export function TrialExpiredBanner() {
+export function TrialExpiredBanner({ isOwner }: { isOwner: boolean }) {
   return (
     <div className="mx-auto max-w-6xl px-4 pb-6 sm:px-6">
       <div className="flex flex-col items-center gap-4 rounded-2xl border-2 border-[oklch(0.6_0.22_30)] bg-[oklch(0.97_0.03_25)] p-6 text-center sm:flex-row sm:text-left">
@@ -14,7 +14,9 @@ export function TrialExpiredBanner() {
             Tu prueba gratuita terminó
           </p>
           <p className="mt-0.5 text-sm text-[oklch(0.4_0.1_25)]">
-            Elige un plan para activar tu suscripción y seguir usando BarberLab.
+            {isOwner
+              ? "Elige un plan para activar tu suscripción y seguir usando BarberLab."
+              : "Pide al dueño de la barbería que active la suscripción para seguir usando BarberLab."}
           </p>
         </div>
       </div>

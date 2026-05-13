@@ -21,7 +21,26 @@ const DAY_LABELS = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
 const WEEKEND = new Set([0, 6]);
 
 export default async function ReportesPage() {
-  const { org } = await getCurrentOrg();
+  const { org, role } = await getCurrentOrg();
+
+  if (role !== "owner") {
+    return (
+      <>
+        <DashboardHeader title="Reportes" />
+        <div className="flex flex-1 items-center justify-center">
+          <div className="text-center">
+            <p className="font-serif text-lg font-semibold">
+              Acceso restringido
+            </p>
+            <p className="mt-1 text-sm text-[color:var(--muted-foreground)]">
+              Solo el dueño de la barbería puede ver los reportes.
+            </p>
+          </div>
+        </div>
+      </>
+    );
+  }
+
   const level = reportsLevel(org.plan);
 
   if (level === "none") {
