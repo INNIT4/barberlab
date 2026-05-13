@@ -36,7 +36,9 @@ export async function createBillingPortalSessionAction(): Promise<
   }
 }
 
-export async function createSubscriptionCheckoutAction(): Promise<
+export async function createSubscriptionCheckoutAction(
+  planOverride?: PlanId
+): Promise<
   { url: string; error?: undefined } | { error: string; url?: undefined }
 > {
   const { org, role } = await getCurrentOrg({ skipTrialRedirect: true });
@@ -47,7 +49,7 @@ export async function createSubscriptionCheckoutAction(): Promise<
   const { allowed } = await rateLimit(`billing:${ip}`, { maxRequests: 5, windowMs: 60_000 });
   if (!allowed) return { error: "Demasiados intentos. Espera un minuto." };
 
-  const plan = org.plan as PlanId;
+  const plan = planOverride ?? (org.plan as PlanId);
   const priceId = getPriceId(plan);
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 

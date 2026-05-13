@@ -23,7 +23,6 @@ const signupSchema = z.object({
   email: z.string().email("Email inválido"),
   phone: z.string().min(8, "Teléfono demasiado corto"),
   password: z.string().min(8, "Mínimo 8 caracteres"),
-  plan: z.enum(["starter", "pro", "premium"]),
   slug: z
     .string()
     .min(3, "Mínimo 3 caracteres")
@@ -221,7 +220,6 @@ export async function signupAction(
     email: formData.get("email"),
     phone: formData.get("phone"),
     password: formData.get("password"),
-    plan: formData.get("plan"),
     slug: normalizedSlug,
   });
 
@@ -279,7 +277,7 @@ export async function signupAction(
           name: data.shop,
           phone: data.phone,
           email: data.email,
-          plan: data.plan,
+          plan: "pro",
           trialEndsAt: trialEnds,
         })
         .returning();

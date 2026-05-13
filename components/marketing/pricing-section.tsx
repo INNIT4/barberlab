@@ -3,10 +3,17 @@ import { Check } from "lucide-react";
 import { PLANS } from "@/lib/data/plans";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { TrialPayButton } from "@/app/(marketing)/precios/trial-pay-button";
 
 import { mxnCurrency } from "@/lib/formatters";
 
-export function PricingSection({ compact = false }: { compact?: boolean }) {
+export function PricingSection({
+  compact = false,
+  trialExpired = false,
+}: {
+  compact?: boolean;
+  trialExpired?: boolean;
+}) {
   return (
     <section
       id="precios"
@@ -103,19 +110,26 @@ export function PricingSection({ compact = false }: { compact?: boolean }) {
             </ul>
 
             <div className="px-7 pb-7 pt-7">
-              <Button
-                asChild
-                className={cn(
-                  "h-11 w-full text-[0.78rem] uppercase tracking-[0.2em] shadow-[3px_3px_0_var(--ink)] transition-transform hover:-translate-y-0.5 hover:shadow-[5px_5px_0_var(--ink)]",
-                  plan.highlighted
-                    ? "bg-[color:var(--oxblood)] text-[color:var(--paper)] hover:bg-[color:var(--ink)]"
-                    : "border border-[color:var(--ink)] bg-transparent text-[color:var(--ink)] hover:bg-[color:var(--ink)] hover:text-[color:var(--paper)]"
-                )}
-              >
-                <Link href={`/signup?plan=${plan.id}`}>
-                  {plan.highlighted ? "Empezar prueba" : "Elegir plan"}
-                </Link>
-              </Button>
+              {trialExpired ? (
+                <TrialPayButton
+                  plan={plan.id}
+                  label={`Elegir ${plan.name}`}
+                />
+              ) : (
+                <Button
+                  asChild
+                  className={cn(
+                    "h-11 w-full text-[0.78rem] uppercase tracking-[0.2em] shadow-[3px_3px_0_var(--ink)] transition-transform hover:-translate-y-0.5 hover:shadow-[5px_5px_0_var(--ink)]",
+                    plan.highlighted
+                      ? "bg-[color:var(--oxblood)] text-[color:var(--paper)] hover:bg-[color:var(--ink)]"
+                      : "border border-[color:var(--ink)] bg-transparent text-[color:var(--ink)] hover:bg-[color:var(--ink)] hover:text-[color:var(--paper)]"
+                  )}
+                >
+                  <Link href={`/signup?plan=${plan.id}`}>
+                    {plan.highlighted ? "Empezar prueba" : "Elegir plan"}
+                  </Link>
+                </Button>
+              )}
             </div>
 
             {/* Perforated bottom edge */}

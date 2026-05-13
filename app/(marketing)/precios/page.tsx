@@ -27,12 +27,11 @@ export default async function PreciosPage() {
   const { data: { user } } = await supabase.auth.getUser();
 
   let trialExpired = false;
-  let expiredOrgPlan: string | null = null;
 
   if (user) {
     const membership = await db.query.memberships.findFirst({
       where: eq(memberships.userId, user.id),
-      with: { organization: { columns: { plan: true, trialEndsAt: true, stripeSubscriptionId: true } } },
+      with: { organization: { columns: { trialEndsAt: true, stripeSubscriptionId: true } } },
     });
     if (
       membership?.organization.trialEndsAt &&
@@ -40,7 +39,6 @@ export default async function PreciosPage() {
       !membership.organization.stripeSubscriptionId
     ) {
       trialExpired = true;
-      expiredOrgPlan = membership.organization.plan;
     }
   }
 
@@ -59,8 +57,8 @@ export default async function PreciosPage() {
         </p>
       </section>
 
-      {trialExpired && <TrialExpiredBanner plan={expiredOrgPlan ?? undefined} />}
-      <PricingSection compact />
+      {trialExpired && <TrialExpiredBanner />}
+      <PricingSection compact trialExpired={trialExpired} />
       <FaqSection />
       <CtaSection remaining={remaining} />
     </>
